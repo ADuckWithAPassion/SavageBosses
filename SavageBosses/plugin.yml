@@ -1,0 +1,8 @@
+name: SavageBosses
+version: 1.0
+api-version: 1.14
+main: tahpie.savage.savagebosses.SavageBosses
+commands:
+  boss:
+    description: Savage Bosses
+    usage: "Usage: /<command>"
