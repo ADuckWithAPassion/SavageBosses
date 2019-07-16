@@ -1,0 +1,9 @@
+1:
+  name: Twiggy's axe
+  mat: DIAMOND_AXE
+  enchants: null
+  rarityInt: 1
+  explosion: null
+  tag: null
+  boss: Twiggy
+  chance: 0.5

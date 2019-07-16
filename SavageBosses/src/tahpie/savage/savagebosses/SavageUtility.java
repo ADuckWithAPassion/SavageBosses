@@ -15,11 +15,11 @@ public class SavageUtility {
 	public SavageUtility() {}
 	
 	public static void displayMessage(String message, Entity target) {
-		target.sendMessage(ChatColor.DARK_GRAY+"["+ChatColor.DARK_BLUE+"SR"+ChatColor.DARK_GRAY+"] "+message);
+		target.sendMessage(ChatColor.DARK_GRAY+"["+ChatColor.BLUE+"SR"+ChatColor.DARK_GRAY+"] "+message);
 	}
 	public static void broadcastMessage(String message, Location loc, int range) {
 		for(Entity nearby: loc.getWorld().getNearbyEntities(loc, range, range, range)) {
-			nearby.sendMessage(ChatColor.DARK_GRAY+"["+ChatColor.DARK_BLUE+"SR"+ChatColor.DARK_GRAY+"] "+message);
+			nearby.sendMessage(ChatColor.DARK_GRAY+"["+ChatColor.BLUE+"SR"+ChatColor.DARK_GRAY+"] "+message);
 		}
 	}
 	public static List<Entity> getNearbyEntities(Entity target, int range, Class<? extends Entity> entityType, boolean includeSelf) {

@@ -5,6 +5,7 @@ import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Random;
 
@@ -277,7 +278,10 @@ public class Twiggy extends EntitySkeleton implements IRangedEntity {
     	}
     }
     public org.bukkit.inventory.ItemStack getBossDrop() {
-    	SpecialItem item = new SpecialItem("Twiggy's Axe", Material.DIAMOND_AXE, null, 1, null, null, "Twiggy", "TahPie", 1, null);
+    	HashMap<String, Integer> enchantmentList = new HashMap<String, Integer>();
+    	enchantmentList.put("DURABILITY", 3);
+
+    	SpecialItem item = new SpecialItem("Twiggy's Axe", "DIAMOND_AXE", enchantmentList, 5, "BLUE", "This is a tag", "Twiggy", "TahPie", 50, null);
     	
     	return item.getItem();
     }
