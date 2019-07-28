@@ -1,9 +1,85 @@
 1:
-  name: Twiggy's axe
+  name: Twiggy's Axe
   mat: DIAMOND_AXE
-  enchants: null
-  rarityInt: 1
-  explosion: null
+  enchantmentList: 
+    DAMAGE_ALL: 1
+    FIRE_ASPECT: 3
+  rarityInt: 5
+  explosionString: BLUE
+  tag: Touched By Twiggy
+  boss: Hoarding Panda
+  killer: TahPie
+  chance: 0
+  effect: null
+2:
+  name: Bard's Buff
+  mat: GLOWSTONE
+  enchantmentList: 
+    SILK_TOUCH: 3
+  rarityInt: 6
+  explosionString: null
   tag: null
-  boss: Twiggy
-  chance: 0.5
+  boss: Hoarding Panda
+  killer: TahPie
+  chance: 0
+  effect: Consume to&a buff&5&o your party.
+3:
+  name: Assassin's Bane
+  mat: BAMBOO
+  enchantmentList: 
+    SILK_TOUCH: 3
+  rarityInt: 6
+  explosionString: null
+  tag: null
+  boss: Hoarding Panda
+  killer: TahPie
+  chance: 0
+  effect: Consume to&a reveal&5&o nearby invisible assassins.
+4:
+  name: Paladins's Aura
+  mat: GOLD_BLOCK
+  enchantmentList: 
+    SILK_TOUCH: 3
+  rarityInt: 6
+  explosionString: null
+  tag: null
+  boss: Hoarding Panda
+  killer: TahPie
+  chance: 0
+  effect: Consume to gain&a invincibility&5&o for 5 seconds.
+5:
+  name: Pyro's Flame
+  mat: BLAZE_POWDER
+  enchantmentList: 
+    SILK_TOUCH: 3
+  rarityInt: 6
+  explosionString: null
+  tag: null
+  boss: Hoarding Panda
+  killer: TahPie
+  chance: 0
+  effect: Right click to apply&a fire ticks&5&o to a target.
+6:
+  name: Beast's Escape
+  mat: LEAD
+  enchantmentList: 
+    SILK_TOUCH: 3
+  rarityInt: 6
+  explosionString: null
+  tag: null
+  boss: Hoarding Panda
+  killer: TahPie
+  chance: 0
+  effect: Consume to&a ride&5&o the beasts pet.
+7:
+  name: Marksman's Leap
+  mat: LILY_PAD
+  enchantmentList: 
+    SILK_TOUCH: 3
+  rarityInt: 6
+  explosionString: null
+  tag: null
+  boss: Hoarding Panda
+  killer: TahPie
+  chance: 0
+  effect: Consume to&a leap&5&o across the skies.

@@ -1,0 +1,115 @@
+LostBerserker:
+  name: Lost Berserker
+  world: worldName
+  location: 
+    - 1
+    - 1
+    - 1
+  type: zombie
+  abilities: 
+    1:
+      ability: Stun
+      trigger: onAbilityCycle
+      target: AreaEnemy
+      range: 10
+      duration: 3
+      cooldown: 20
+      debuffs: 
+        - BLINDNESS, 1
+        - WITHERING, 1
+      messageBroadcast: NAME Roars at all nearby enemies, leaving them stunned.
+      conditions:
+        - targetNotStunCooldown
+    2:
+      ability: Push
+      trigger: onAttacked
+      target: AttackingEnemy
+      range: 10
+      chance: 0.2
+      cooldown: 5
+      potency: 1
+      debuffs:
+        - BLINDNESS, 1
+        - POISON, 1
+      messageBroadcast: NAME Flings TARGET into the sky.
+      conditions: 
+        - targetNotStunned
+    3:
+      ability: Stun
+      trigger: onAttack
+      target: AttackedEnemy
+      range: 10
+      duration: 3
+      cooldown: 20
+      debuffs:
+        - BLINDNESS, 1
+        - POISON, 1
+      messageBroadcast: NAME Headbutts TARGET, stunning him for a few seconds.
+      conditions: 
+        - areaNotStunCooldown
+    4:
+      ability: Buff
+      trigger: onAbilityCycle
+      target: Self
+      range: 10
+      duration: 6
+      cooldown: 20
+      buffs:
+        - INCREASE_DAMAGE, 3
+        - SPEED, 3
+      messageBroadcast: NAME Uses Rage, gaining a powerful buff.
+  respawn: 100
+  delay: 7
+  baseHealth: 500
+  weapon: IRON_AXE
+  helmet: IRON_HELMET
+  chest: LEATHER_CHESTPLATE
+  legs: LEATHER_LEGGINGS
+  boots: IRON_BOOTS
+  difficulty: 1
+CorruptedPaladin:
+  name: Corrupted Paladin
+  world: worldName
+  location: 
+    - 1
+    - 1
+    - 1
+  type: pig_zombie
+  abilities: 
+    1:
+      ability: Heal
+      trigger: onAbilityCycle
+      target: Self
+      range: 10
+      duration: 3
+      cooldown: 10
+      potency: 20
+      messageBroadcast: NAME Calls to the nether for an unholy remedy.
+    2:
+      ability: Push
+      trigger: onAttacked
+      target: AttackingEnemy
+      range: 10
+      chance: 0.2
+      cooldown: 5
+      potency: 1
+      messageBroadcast: NAME Slams TARGET away from them.
+      conditions: 
+        - targetNotStunned
+    3:
+      ability: SummonAllies
+      trigger: onAttack
+      target: AttackedEnemy
+      range: 10
+      cooldown: 10
+      messageBroadcast: NAME Calls for the undead to rise and defend him.
+  respawn: 20
+  delay: 3
+  baseHealth: 50
+  weapon: GOLDEN_SWORD
+  helmet: GOLDEN_HELMET
+  chest: GOLDEN_CHESTPLATE
+  legs: GOLDEN_LEGGINGS
+  boots: GOLDEN_BOOTS
+  difficulty: 1
+  
