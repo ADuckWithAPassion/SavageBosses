@@ -15,27 +15,27 @@ public enum Targets {
 
 	Self {
 		@Override
-		List<LivingEntity> make(Ability ability, EntityDamageByEntityEvent event, IndividualBoss IB) {
+		List<LivingEntity> get(Ability ability, EntityDamageByEntityEvent event, IndividualBoss IB) {
 			return Arrays.asList(IB.getParent());
 		}
 	},
 	AttackingEnemy {
 		@Override
-		List<LivingEntity> make(Ability ability, EntityDamageByEntityEvent event, IndividualBoss IB) {
+		List<LivingEntity> get(Ability ability, EntityDamageByEntityEvent event, IndividualBoss IB) {
 			return Arrays.asList((LivingEntity)event.getDamager());
 		}
 	},
 	AttackedEnemy {
 		@Override
-		List<LivingEntity> make(Ability ability, EntityDamageByEntityEvent event, IndividualBoss IB) {
+		List<LivingEntity> get(Ability ability, EntityDamageByEntityEvent event, IndividualBoss IB) {
 			return Arrays.asList((LivingEntity)event.getEntity());
 		}
 	},
 	AreaEnemy {
 		@Override
-		List<LivingEntity> make(Ability ability, EntityDamageByEntityEvent event, IndividualBoss IB) {
+		List<LivingEntity> get(Ability ability, EntityDamageByEntityEvent event, IndividualBoss IB) {
 			return SavageUtility.getNearbyEntities((Entity)IB.getParent(), ability.getRange(), org.bukkit.entity.Player.class, false);
 		}
 	};
-	abstract List<LivingEntity> make(Ability ability, EntityDamageByEntityEvent event, IndividualBoss IB);
+	abstract List<LivingEntity> get(Ability ability, EntityDamageByEntityEvent event, IndividualBoss IB);
 }

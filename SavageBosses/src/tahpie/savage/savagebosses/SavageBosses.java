@@ -37,7 +37,7 @@ public class SavageBosses extends JavaPlugin implements Listener{
 	public void onEnable() {
 		getServer().getPluginManager().registerEvents(this, this);
 		Objects.requireNonNull(this.getCommand("boss")).setExecutor(new CommandHandler(this));
-        getServer().getPluginManager().registerEvents(new Boss(), this);
+        getServer().getPluginManager().registerEvents(new Boss(this), this);
 		getLogger().info("enabled!");
 		createItemConfig();
 		createBossConfig();

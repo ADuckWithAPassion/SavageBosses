@@ -126,7 +126,6 @@ public abstract class Ability {
 		}
 		public void cancel() {
 			Bukkit.getScheduler().cancelTask(task);
-			Log.info("CANCEL");
 		}
 		@Override
 		public void run() {
@@ -139,10 +138,10 @@ public abstract class Ability {
 	}
 	public List<LivingEntity> getTargets(EntityDamageByEntityEvent event, IndividualBoss IB){
 		try {
-			return Targets.valueOf(this.getTarget()).make(this, event, IB);
+			return Targets.valueOf(this.getTarget()).get(this, event, IB);
 		}
 		catch(Error error) {
-			error.printStackTrace();
+			error.printStackTrace(); 
 		}
 		return null;
 	}
@@ -153,9 +152,6 @@ public abstract class Ability {
 		String message = getMessageBroadcast(event, IB);
 		if(!(ChatColor.stripColor(message).equalsIgnoreCase("null"))) {
 			SavageUtility.broadcastMessage(message, IB.getParent().getLocation(), getRange());			
-		}
-		else {
-			Log.info("DED",getMessageBroadcast(event, IB));
 		}
 		addToQueue(getCooldown(), IB);
 		return true;

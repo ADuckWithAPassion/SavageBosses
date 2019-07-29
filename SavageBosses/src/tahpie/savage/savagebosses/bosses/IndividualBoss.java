@@ -21,18 +21,18 @@ public class IndividualBoss {
 	private cycle abilityCycle;
 	private GenericBoss GB;
 	private SavageBosses SB;
-	private Location loc;
+	private Location spawnLocation;
 	List<Ability> queuedCastableAbilities = new ArrayList<Ability>();
 	List<Ability> queuedOnAttackAbilities = new ArrayList<Ability>();
 	List<Ability> queuedOnAttackedAbilities = new ArrayList<Ability>();
 	List<Ability> abilities = new ArrayList<Ability>();
 	
-	public IndividualBoss(GenericBoss GB, Location loc, SavageBosses SB) {
+	public IndividualBoss(GenericBoss GB, Location spawnLocation, SavageBosses SB) {
 		this.GB = GB;
 		this.SB = SB;
-		this.loc = loc;
+		this.spawnLocation = spawnLocation;
 		try {
-			parent = (LivingEntity)loc.getWorld().spawnEntity(loc, EntityType.valueOf(GB.getType().toUpperCase()));
+			parent = (LivingEntity)spawnLocation.getWorld().spawnEntity(spawnLocation, EntityType.valueOf(GB.getType().toUpperCase()));
 			parent.getAttribute(Attribute.GENERIC_MAX_HEALTH).setBaseValue(GB.getHealth());
 			parent.setHealth(parent.getAttribute(Attribute.GENERIC_MAX_HEALTH).getBaseValue());
 			Log.info(GB.getHealth());
@@ -93,7 +93,6 @@ public class IndividualBoss {
 		}
 		@Override
 		public void run() {
-			Log.info(parent.getLocation().toVector());
 			if(parent.isDead()) {
 				destroy();
 				return;
@@ -104,24 +103,6 @@ public class IndividualBoss {
 			}
 		}
 	}
-	class bringBackToLife implements Runnable{
-		int task;
-		int respawn;
-		GenericBoss GB;
-		public bringBackToLife(int respawn, GenericBoss GB, SavageBosses SB) {
-			this.GB = GB;
-			this.respawn = respawn;
-			task = Bukkit.getScheduler().scheduleSyncDelayedTask(SB, this, respawn*20);	
-		}
-		public void cancel() {
-			Bukkit.getScheduler().cancelTask(task);	
-		}
-		@Override
-		public void run() {
-			Log.info(loc);
-			GB.spawn(loc);
-		}
-	}	
 	public void destroy() {
 		for(Ability ability: GB.getAbilities()) {
 			ability.remove(this);
@@ -129,10 +110,20 @@ public class IndividualBoss {
 		abilityCycle.cancel();
 		Boss.unRegisterBoss(this);
 		parent.remove();
-		new bringBackToLife(GB.getRespawn(), GB, SB);
 		return;
 	}
 	protected void finalize() {
 		Log.info("Garbage Collected: "+getName());
+	}
+
+	public Location getSpawn() {
+		return spawnLocation;
+	}
+
+	public void getDrop() {
+		ItemStack drop = GB.getDrop();
+		if(!(drop.getType().equals(Material.AIR))) {
+			parent.getWorld().dropItemNaturally(parent.getLocation(), drop);
+		}
 	}
 }

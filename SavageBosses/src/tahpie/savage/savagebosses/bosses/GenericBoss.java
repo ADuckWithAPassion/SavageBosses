@@ -3,7 +3,10 @@ package tahpie.savage.savagebosses.bosses;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.Random;
 
 import javax.print.CancelablePrintJob;
 
@@ -21,17 +24,16 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.entity.EntityDeathEvent;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.potion.PotionEffect;
+import org.bukkit.potion.PotionEffectType;
 
 import tahpie.savage.savagebosses.SavageBosses;
 import tahpie.savage.savagebosses.bosses.abilities.Ability;
 
 public class GenericBoss implements Listener{
 	private String name;
-	private String world;
-	private List<?> coords;
 	private String type;
 	private ConfigurationSection abilitiesSection;
-	private int respawn;
 	private int delay;
 	private String weapon;
 	private String helmet;
@@ -40,23 +42,19 @@ public class GenericBoss implements Listener{
 	private String legs;
 	private String boots;
 	private int difficulty;
-	private LivingEntity parent;
+	private List<?> drops;
 	private SavageBosses SB;
 	private List<Ability> abilities = new ArrayList<Ability>();
 	List<Ability> queuedCastableAbilities = new ArrayList<Ability>();
 	List<Ability> queuedOnAttackAbilities = new ArrayList<Ability>();
 	List<Ability> queuedOnAttackedAbilities = new ArrayList<Ability>();
-	private Location spawnLocation;
 	
 	public GenericBoss(ConfigurationSection section, SavageBosses SB) {
 		this.SB = SB;
 
 		name = section.getString("name");
-		world = section.getString("world");
-		coords = section.getList("location");
 		type = section.getString("type");
 		abilitiesSection = section.getConfigurationSection("abilities");
-		respawn = section.getInt("respawn");
 		delay = section.getInt("delay");
 		baseHealth = section.getInt("baseHealth");
 		weapon = section.getString("weapon");
@@ -65,20 +63,54 @@ public class GenericBoss implements Listener{
 		legs = section.getString("legs");
 		boots = section.getString("boots");
 		difficulty = section.getInt("difficulty");
+		drops = section.getList("drops");
 		
+		if(name == null) {
+			name = "SetMeAName";
+		}
+		if(type == null) {
+			type = "zombie";
+		}
+		if(delay == 0) {
+			delay = 7;
+		}
+		if(baseHealth == 0) {
+			baseHealth = 50;
+		}
+		if(difficulty == 0) {
+			difficulty = 1;
+		}
+		if(weapon == null) {
+			weapon = "AIR";
+		}
+		if(helmet == null) {
+			helmet = "AIR";
+		}
+		if(chest == null) {
+			chest = "AIR";
+		}
+		if(legs == null) {
+			legs = "AIR";
+		}
+		if(boots == null) {
+			boots = "AIR";
+		}
+
 		loadAbilities(abilitiesSection);
 	}
 	public void loadAbilities(ConfigurationSection abilitiesSection) {
-		for(String abilityID: abilitiesSection.getKeys(false)) {
-			ConfigurationSection abilitySection = abilitiesSection.getConfigurationSection(abilityID);
-			try {
-				Class<?> abilityClass = Class.forName("tahpie.savage.savagebosses.bosses.abilities."+abilitySection.getString("ability"));
-				Constructor con = abilityClass.getConstructor(ConfigurationSection.class, SavageBosses.class);
-				Ability ability = (Ability) con.newInstance(abilitySection, SB);
-				abilities.add(ability);
-			} catch (ClassNotFoundException | NoSuchMethodException | SecurityException | InstantiationException | IllegalAccessException | IllegalArgumentException | InvocationTargetException e) {
-				Log.info(abilitySection.getString("ability") + " DOES NOT EXIST");
-				e.printStackTrace();
+		if(abilitiesSection != null) {
+			for(String abilityID: abilitiesSection.getKeys(false)) {
+				ConfigurationSection abilitySection = abilitiesSection.getConfigurationSection(abilityID);
+				try {
+					Class<?> abilityClass = Class.forName("tahpie.savage.savagebosses.bosses.abilities."+abilitySection.getString("ability"));
+					Constructor con = abilityClass.getConstructor(ConfigurationSection.class, SavageBosses.class);
+					Ability ability = (Ability) con.newInstance(abilitySection, SB);
+					abilities.add(ability);
+				} catch (ClassNotFoundException | NoSuchMethodException | SecurityException | InstantiationException | IllegalAccessException | IllegalArgumentException | InvocationTargetException e) {
+					Log.info(abilitySection.getString("ability") + " DOES NOT EXIST");
+					e.printStackTrace();
+				}
 			}
 		}
 	}
@@ -112,7 +144,18 @@ public class GenericBoss implements Listener{
 	public double getHealth() {
 		return baseHealth;
 	}
-	public int getRespawn() {
-		return respawn;
+	public ItemStack getDrop() {
+		double cumProbability = 0;
+		double number = Math.random();
+		for(Object details: drops) {
+			HashMap detailMap = (HashMap)details;
+			String itemName = detailMap.get("item").toString();
+			Double itemProbability = Double.valueOf(detailMap.get("probability").toString());
+			cumProbability += itemProbability;
+			if(cumProbability >= number) {
+				return(new ItemStack(Material.getMaterial(itemName)));
+			}
+		}
+		return(new ItemStack(Material.AIR));
 	}
 }

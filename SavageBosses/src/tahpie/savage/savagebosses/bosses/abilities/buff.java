@@ -30,7 +30,6 @@ public class Buff extends Ability{
 					SavageUtility.displayMessage(message,target);
 				}
 
-				Log.info(buff.split(",")[0]);
 				PotionEffect effect = new PotionEffect(PotionEffectType.getByName(buff.split(",")[0]), getDuration()*20, Integer.parseInt(buff.split(",")[1].replaceAll(" ", ""))-1);
 				target.addPotionEffect(effect);
 			}	

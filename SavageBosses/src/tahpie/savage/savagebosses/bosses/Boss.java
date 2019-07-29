@@ -3,16 +3,23 @@ package tahpie.savage.savagebosses.bosses;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map.Entry;
 import java.util.Random;
 
+import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.DyeColor;
 import org.bukkit.EntityEffect;
 import org.bukkit.FireworkEffect;
+import org.bukkit.Material;
 import org.bukkit.Sound;
+import org.bukkit.block.Block;
+import org.bukkit.block.CreatureSpawner;
+import org.bukkit.block.Sign;
 import org.bukkit.FireworkEffect.Type;
 import org.bukkit.craftbukkit.libs.jline.internal.Log;
 import org.bukkit.craftbukkit.v1_14_R1.CraftWorld;
+import org.bukkit.craftbukkit.v1_14_R1.block.CraftCreatureSpawner;
 import org.bukkit.craftbukkit.v1_14_R1.entity.CraftEntity;
 import org.bukkit.craftbukkit.v1_14_R1.entity.CraftPanda;
 import org.bukkit.craftbukkit.v1_14_R1.entity.CraftPlayer;
@@ -27,6 +34,7 @@ import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.event.entity.EntityDeathEvent;
 import org.bukkit.event.entity.EntitySpawnEvent;
+import org.bukkit.event.entity.SpawnerSpawnEvent;
 import org.bukkit.event.entity.EntityDamageEvent.DamageCause;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.inventory.ItemStack;
@@ -39,6 +47,7 @@ import org.bukkit.util.Vector;
 import net.minecraft.server.v1_14_R1.EntityTypes;
 import savageclasses.Marksman;
 import savageclasses.Cooldown;
+import tahpie.savage.savagebosses.SavageBosses;
 import tahpie.savage.savagebosses.SavageUtility;
 
 public class Boss implements Listener{
@@ -47,12 +56,15 @@ public class Boss implements Listener{
 	private List<DamageCause> reducedDamage;
 	private Cooldown globalItemCooldown;
 	private static HashMap<LivingEntity,IndividualBoss> bosses = new HashMap<LivingEntity, IndividualBoss>();
+	private SavageBosses SB;
 	
-	public Boss() {
+	public Boss(SavageBosses SB) {
+		this.SB = SB;
 		random = new Random();
 		disallowedDamage = Arrays.asList(DamageCause.BLOCK_EXPLOSION,DamageCause.ENTITY_EXPLOSION, DamageCause.LAVA, DamageCause.FALL);
 		reducedDamage = Arrays.asList(DamageCause.PROJECTILE, DamageCause.FIRE);
 		globalItemCooldown = new Cooldown(1000*6);
+		Bukkit.getScheduler().scheduleSyncRepeatingTask(SB, new ensureNearbySpawn(), 20*10, 20*10);
 	}
 	@EventHandler
 	public void clearRandomDrops(EntityDeathEvent event) {
@@ -89,11 +101,30 @@ public class Boss implements Listener{
 		}
 	}
 	@EventHandler
+	public void onSpawn(SpawnerSpawnEvent event) {
+		CreatureSpawner spawner = event.getSpawner();
+		CraftCreatureSpawner craftSpawner = ((CraftCreatureSpawner)spawner);
+		craftSpawner.setSpawnCount(2);
+		Entity entity = event.getEntity();
+		Block block = spawner.getWorld().getBlockAt(spawner.getLocation().subtract(0, 1, 0));
+		if(block.getBlockData().getMaterial().equals(Material.OAK_SIGN)) {
+			Sign sign = (Sign)block.getState(); 
+			String text = sign.getLine(0);
+			if(SB.getBosses().containsKey(text)) {
+				Log.info(entity.getNearbyEntities(10, 10, 10));
+				if(entity.getNearbyEntities(10, 10, 10).size() <= 5) {
+					new IndividualBoss(SB.getBosses().get(text), entity.getLocation(), SB);					
+				}
+				entity.remove();
+			}
+		}
+	}
+	@EventHandler
 	public void onDeath(EntityDeathEvent event){
-		Log.info(event.getEntity());
 		if(event.getEntity() instanceof LivingEntity) {
 			LivingEntity dead = (LivingEntity)event.getEntity();
 			if(bosses.containsKey(dead)){
+				bosses.get(dead).getDrop();
 				bosses.get(dead).destroy();				
 			}
 		}
@@ -163,6 +194,23 @@ public class Boss implements Listener{
 					}
 				}
 			}
+		}
+	}
+	public class ensureNearbySpawn implements Runnable{
+		public ensureNearbySpawn() {
+		}
+		@Override
+		public void run() {
+			for(Entry<LivingEntity, IndividualBoss> entry: new HashMap<LivingEntity, IndividualBoss>(bosses).entrySet()) {
+				if(entry.getValue().getSpawn().distance(entry.getKey().getLocation())>=20) {
+					SavageUtility.broadcastMessage(ChatColor.DARK_GRAY+entry.getValue().getName()+": I have wandered too far...", entry.getKey().getLocation(), 15);
+					entry.getValue().destroy();
+				}
+				else if(entry.getKey().getTicksLived() >= 20*10) {
+					SavageUtility.broadcastMessage(ChatColor.DARK_GRAY+entry.getValue().getName()+": I am too old...", entry.getKey().getLocation(), 15);
+					entry.getValue().destroy();	
+				}
+			}	
 		}
 	}
 	private void marksmansLeap(ItemStack item, Player player) {
