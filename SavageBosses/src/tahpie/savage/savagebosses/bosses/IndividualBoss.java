@@ -3,16 +3,22 @@ package tahpie.savage.savagebosses.bosses;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.apache.commons.lang.StringUtils;
 import org.bukkit.Bukkit;
+import org.bukkit.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.attribute.Attribute;
 import org.bukkit.craftbukkit.libs.jline.internal.Log;
+import org.bukkit.craftbukkit.v1_14_R1.entity.CraftLivingEntity;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.metadata.FixedMetadataValue;
 
+import net.minecraft.server.v1_14_R1.EntityLiving;
 import tahpie.savage.savagebosses.SavageBosses;
+import tahpie.savage.savagebosses.SavageUtility;
 import tahpie.savage.savagebosses.bosses.abilities.Ability;
 
 public class IndividualBoss {
@@ -35,7 +41,9 @@ public class IndividualBoss {
 			parent = (LivingEntity)spawnLocation.getWorld().spawnEntity(spawnLocation, EntityType.valueOf(GB.getType().toUpperCase()));
 			parent.getAttribute(Attribute.GENERIC_MAX_HEALTH).setBaseValue(GB.getHealth());
 			parent.setHealth(parent.getAttribute(Attribute.GENERIC_MAX_HEALTH).getBaseValue());
-			Log.info(GB.getHealth());
+			parent.setMetadata("boss", new FixedMetadataValue(SB, true));
+			parent.setCustomName(ChatColor.GOLD+GB.getName()+ChatColor.DARK_GREEN+StringUtils.repeat("✪",GB.getDifficulty()));
+			SavageUtility.addCustomMobID(parent.getUniqueId());
 		}
 		catch(NullPointerException error) {
 			Log.info("ENTITY TYPE NOT FOUND");
@@ -45,7 +53,7 @@ public class IndividualBoss {
 			ability.addToQueue(3,this);
 		}
 		Boss.registerBoss(this);
-		abilityCycle = new cycle(3, this, SB);
+		abilityCycle = new cycle(Math.toIntExact(Math.round((Math.random()*10)+2)), this, SB);
 		}
 	
 	public LivingEntity getParent() {
@@ -109,6 +117,7 @@ public class IndividualBoss {
 		}
 		abilityCycle.cancel();
 		Boss.unRegisterBoss(this);
+		SavageUtility.removeCustomMobID(parent.getUniqueId());
 		parent.remove();
 		return;
 	}
@@ -125,5 +134,8 @@ public class IndividualBoss {
 		if(!(drop.getType().equals(Material.AIR))) {
 			parent.getWorld().dropItemNaturally(parent.getLocation(), drop);
 		}
+	}
+	public int getExp() {
+		return GB.getExp();
 	}
 }

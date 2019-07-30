@@ -4,18 +4,24 @@ import java.util.UUID;
 
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
+import org.bukkit.Location;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.craftbukkit.v1_14_R1.CraftWorld;
+import org.bukkit.entity.EntityType;
+import org.bukkit.entity.Fireball;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
+import org.bukkit.entity.Projectile;
 import org.bukkit.event.Listener;
+import org.bukkit.util.Vector;
 
 import net.minecraft.server.v1_14_R1.WorldServer;
 import tahpie.savage.savagebosses.bosses.GenericBoss;
 import tahpie.savage.savagebosses.bosses.HoardingPanda;
 import tahpie.savage.savagebosses.bosses.Twiggy;
+import tahpie.savage.savagebosses.bosses.abilities.BigFireball;
 
 public class CommandHandler implements Listener, CommandExecutor{
 	SavageBosses SB;

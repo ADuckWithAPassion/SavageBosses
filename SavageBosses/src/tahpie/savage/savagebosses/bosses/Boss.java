@@ -24,6 +24,7 @@ import org.bukkit.craftbukkit.v1_14_R1.entity.CraftEntity;
 import org.bukkit.craftbukkit.v1_14_R1.entity.CraftPanda;
 import org.bukkit.craftbukkit.v1_14_R1.entity.CraftPlayer;
 import org.bukkit.entity.Entity;
+import org.bukkit.entity.ExperienceOrb;
 import org.bukkit.entity.Firework;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
@@ -55,7 +56,7 @@ public class Boss implements Listener{
 	private List<DamageCause> disallowedDamage;
 	private List<DamageCause> reducedDamage;
 	private Cooldown globalItemCooldown;
-	private static HashMap<LivingEntity,IndividualBoss> bosses = new HashMap<LivingEntity, IndividualBoss>();
+	public static HashMap<LivingEntity,IndividualBoss> bosses = new HashMap<LivingEntity, IndividualBoss>();
 	private SavageBosses SB;
 	
 	public Boss(SavageBosses SB) {
@@ -66,12 +67,6 @@ public class Boss implements Listener{
 		globalItemCooldown = new Cooldown(1000*6);
 		Bukkit.getScheduler().scheduleSyncRepeatingTask(SB, new ensureNearbySpawn(), 20*10, 20*10);
 	}
-	@EventHandler
-	public void clearRandomDrops(EntityDeathEvent event) {
-		if(event.getEntity().hasMetadata("boss")) {
-			event.getDrops().clear();	
-		}
-	}
 	public static void registerBoss(IndividualBoss boss) {
 		bosses.put(boss.getParent(), boss);
 	}
@@ -80,7 +75,6 @@ public class Boss implements Listener{
 	}
 	@EventHandler
 	public void onAttack(EntityDamageByEntityEvent event){
-		Log.info(bosses);
 		if(event.getEntity() instanceof LivingEntity && event.getDamager() instanceof LivingEntity) {
 			LivingEntity damaged = (LivingEntity)event.getEntity();
 			LivingEntity damager = (LivingEntity)event.getDamager();
@@ -111,7 +105,6 @@ public class Boss implements Listener{
 			Sign sign = (Sign)block.getState(); 
 			String text = sign.getLine(0);
 			if(SB.getBosses().containsKey(text)) {
-				Log.info(entity.getNearbyEntities(10, 10, 10));
 				if(entity.getNearbyEntities(10, 10, 10).size() <= 5) {
 					new IndividualBoss(SB.getBosses().get(text), entity.getLocation(), SB);					
 				}
@@ -122,8 +115,15 @@ public class Boss implements Listener{
 	@EventHandler
 	public void onDeath(EntityDeathEvent event){
 		if(event.getEntity() instanceof LivingEntity) {
+			if(event.getEntity().hasMetadata("boss")) {
+				event.getDrops().clear();	
+			}
+			Log.info(event.getDrops());
 			LivingEntity dead = (LivingEntity)event.getEntity();
 			if(bosses.containsKey(dead)){
+				event.setDroppedExp(bosses.get(dead).getExp());
+                int xp = (int) bosses.get(dead).getExp();
+                ((ExperienceOrb)dead.getWorld().spawn(dead.getLocation(), ExperienceOrb.class)).setExperience(xp);
 				bosses.get(dead).getDrop();
 				bosses.get(dead).destroy();				
 			}
@@ -206,7 +206,7 @@ public class Boss implements Listener{
 					SavageUtility.broadcastMessage(ChatColor.DARK_GRAY+entry.getValue().getName()+": I have wandered too far...", entry.getKey().getLocation(), 15);
 					entry.getValue().destroy();
 				}
-				else if(entry.getKey().getTicksLived() >= 20*10) {
+				else if(entry.getKey().getTicksLived() >= 20*100) {
 					SavageUtility.broadcastMessage(ChatColor.DARK_GRAY+entry.getValue().getName()+": I am too old...", entry.getKey().getLocation(), 15);
 					entry.getValue().destroy();	
 				}

@@ -68,7 +68,6 @@ import net.minecraft.server.v1_14_R1.World;
 import tahpie.savage.savagebosses.SavageBosses;
 import tahpie.savage.savagebosses.SavageUtility;
 import tahpie.savage.savagebosses.questitems.SpecialItem;
-import tahpie.savage.savagequests.friendlyNPC.customZombie.PathfinderGoalArrowAttack;
 
 public class Twiggy extends EntitySkeleton implements IRangedEntity {
 	Skeleton parent;

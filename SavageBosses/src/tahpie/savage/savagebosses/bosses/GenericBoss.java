@@ -11,6 +11,7 @@ import java.util.Random;
 import javax.print.CancelablePrintJob;
 
 import org.bukkit.Bukkit;
+import org.bukkit.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.configuration.ConfigurationSection;
@@ -48,6 +49,7 @@ public class GenericBoss implements Listener{
 	List<Ability> queuedCastableAbilities = new ArrayList<Ability>();
 	List<Ability> queuedOnAttackAbilities = new ArrayList<Ability>();
 	List<Ability> queuedOnAttackedAbilities = new ArrayList<Ability>();
+	private int xp;
 	
 	public GenericBoss(ConfigurationSection section, SavageBosses SB) {
 		this.SB = SB;
@@ -64,6 +66,7 @@ public class GenericBoss implements Listener{
 		boots = section.getString("boots");
 		difficulty = section.getInt("difficulty");
 		drops = section.getList("drops");
+		xp = section.getInt("xp");
 		
 		if(name == null) {
 			name = "SetMeAName";
@@ -157,5 +160,11 @@ public class GenericBoss implements Listener{
 			}
 		}
 		return(new ItemStack(Material.AIR));
+	}
+	public int getDifficulty() {
+		return difficulty;
+	}
+	public int getExp() {
+		return xp;
 	}
 }

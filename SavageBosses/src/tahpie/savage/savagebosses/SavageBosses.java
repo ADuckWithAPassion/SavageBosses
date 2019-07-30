@@ -12,7 +12,6 @@ import org.bukkit.plugin.java.JavaPlugin;
 import tahpie.savage.savagebosses.bosses.Boss;
 import tahpie.savage.savagebosses.bosses.GenericBoss;
 import tahpie.savage.savagebosses.questitems.SpecialItem;
-import tahpie.savage.savagequests.CommandQuest;
 
 import java.io.File;
 import java.io.IOException;

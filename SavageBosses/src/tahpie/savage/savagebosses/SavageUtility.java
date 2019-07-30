@@ -2,6 +2,7 @@ package tahpie.savage.savagebosses;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.List;
 import java.util.UUID;
 
@@ -25,9 +26,11 @@ import com.sk89q.worldguard.protection.regions.RegionContainer;
 import com.sk89q.worldguard.protection.regions.RegionQuery;
 
 import net.md_5.bungee.api.ChatColor;
+import tahpie.savage.savagebosses.bosses.Boss;
 
 public class SavageUtility {
 	private static List<UUID> bossUUIDs = new ArrayList<UUID>();
+	private static List<UUID> customMobUUIDs = new ArrayList<UUID>();
 
 	public SavageUtility() {}
 	
@@ -142,8 +145,17 @@ public class SavageUtility {
 			Log.info("Removing: "+bossID+", "+Bukkit.getEntity(bossID).getName());
 			Bukkit.getEntity(bossID).remove();
 			Log.info("REMOVED");
-		}		
+		}
+		for(UUID customMobID: getCustomMobIDs()) {
+			Log.info("Removing: "+customMobID+", "+Bukkit.getEntity(customMobID).getName());
+			Boss.bosses.get(Bukkit.getEntity(customMobID)).destroy();
+			Log.info("REMOVED");
+		}
 	}
+	private static List<UUID> getCustomMobIDs() {
+		return new ArrayList<UUID>(customMobUUIDs );
+	}
+
 	public static List<UUID> getBossUUIDs() {
 		return new ArrayList<UUID>(bossUUIDs);
 	}
@@ -154,5 +166,12 @@ public class SavageUtility {
 
 	public static void removeBossUUID(UUID uniqueID) {
 		bossUUIDs.remove(uniqueID);
+	}
+
+	public static void addCustomMobID(UUID uniqueId) {
+		customMobUUIDs.add(uniqueId);
+	}
+	public static void removeCustomMobID(UUID uniqueId) {
+		customMobUUIDs.remove(uniqueId);
 	}
 }

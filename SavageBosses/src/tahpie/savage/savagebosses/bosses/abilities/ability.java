@@ -92,14 +92,14 @@ public abstract class Ability {
 		String newMessage = messageBroadcast;
 		newMessage = ChatColor.GREEN+newMessage;
 		newMessage = newMessage.replaceAll("NAME", ChatColor.DARK_RED+IB.getName()+ChatColor.GREEN);
-		if(event != null) {
-			String names = "";
-			for(LivingEntity le: getTargets(event,IB)) {
-				names = names+le.getName()+", ";
-			}
-			names = names.substring(0, names.length()-2);
-			newMessage = newMessage.replaceAll("TARGET", ChatColor.GOLD+names+ChatColor.GREEN);	
+		String names = "";
+		for(LivingEntity le: getTargets(event,IB)) {
+			names = names+le.getName()+", ";
 		}
+		names = names.substring(0, names.length()-2);
+		newMessage = newMessage.replaceAll("TARGET", ChatColor.GOLD+names+ChatColor.GREEN);	
+		Log.info(names);
+		Log.info(newMessage);
 		return newMessage;
 	}
 	public String getMessagePrivate(EntityDamageByEntityEvent event, IndividualBoss IB) {
@@ -160,7 +160,6 @@ public abstract class Ability {
 		return queueMap.get(IB);
 	}
 	public void remove(IndividualBoss IB) {
-		Log.info(queueMap);
 		if(queueMap.containsKey(IB)) {
 			queueMap.get(IB).cancel();
 			queueMap.remove(IB);			
