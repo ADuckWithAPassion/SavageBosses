@@ -98,8 +98,6 @@ public abstract class Ability {
 		}
 		names = names.substring(0, names.length()-2);
 		newMessage = newMessage.replaceAll("TARGET", ChatColor.GOLD+names+ChatColor.GREEN);	
-		Log.info(names);
-		Log.info(newMessage);
 		return newMessage;
 	}
 	public String getMessagePrivate(EntityDamageByEntityEvent event, IndividualBoss IB) {

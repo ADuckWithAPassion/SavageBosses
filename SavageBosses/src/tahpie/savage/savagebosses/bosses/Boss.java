@@ -105,7 +105,13 @@ public class Boss implements Listener{
 			Sign sign = (Sign)block.getState(); 
 			String text = sign.getLine(0);
 			if(SB.getBosses().containsKey(text)) {
-				if(entity.getNearbyEntities(10, 10, 10).size() <= 5) {
+				int count = 0;
+				for(Entity nearby : entity.getNearbyEntities(10, 10, 10)) {
+					if(nearby instanceof LivingEntity) {
+						count++;
+					}
+				}
+				if(count <= 5) {
 					new IndividualBoss(SB.getBosses().get(text), entity.getLocation(), SB);					
 				}
 				entity.remove();

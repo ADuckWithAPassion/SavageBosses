@@ -1,10 +1,5 @@
 LostBerserker:
   name: Lost Berserker
-  world: worldName
-  location: 
-    - 1
-    - 1
-    - 1
   type: zombie
   abilities: 
     1:
@@ -58,52 +53,86 @@ LostBerserker:
         - INCREASE_DAMAGE, 3
         - SPEED, 3
       messageBroadcast: NAME Uses Rage, gaining a powerful buff.
-  respawn: 100
   delay: 7
-  baseHealth: 500
+  baseHealth: 50
   weapon: IRON_AXE
   helmet: IRON_HELMET
   chest: LEATHER_CHESTPLATE
   legs: LEATHER_LEGGINGS
   boots: IRON_BOOTS
   difficulty: 1
+  drops: 
+    - item: BLAZE_ROD
+      probability: 0.1
+    - item: GOLDEN_SWORD
+      probability: 0.5
 CorruptedPaladin:
   name: Corrupted Paladin
-  world: worldName
-  location: 
-    - 1
-    - 1
-    - 1
   type: pig_zombie
   abilities: 
     1:
-      ability: Heal
+      ability: BigFireball
       trigger: onAbilityCycle
-      target: Self
+      target: AreaEnemy
       range: 10
       duration: 3
       cooldown: 10
       potency: 20
-      messageBroadcast: NAME Calls to the nether for an unholy remedy.
+      messageBroadcast: NAME Calls to the nether for a big fireball.
     2:
-      ability: Push
-      trigger: onAttacked
-      target: AttackingEnemy
+      ability: Critical
+      trigger: onAttack
+      target: AttackedEnemy
       range: 10
       chance: 0.2
       cooldown: 5
       potency: 1
-      messageBroadcast: NAME Slams TARGET away from them.
+      messageBroadcast: NAME Crits TARGET.
       conditions: 
         - targetNotStunned
     3:
-      ability: SummonAllies
-      trigger: onAttack
-      target: AttackedEnemy
+      ability: LittleFireball
+      trigger: onAbilityCycle
+      target: AreaEnemy
       range: 10
       cooldown: 10
-      messageBroadcast: NAME Calls for the undead to rise and defend him.
-  respawn: 20
+      messageBroadcast: NAME Calls to the nether for a small fireball.
+    4:
+      ability: Switch
+      trigger: onAttacked
+      target: AttackingEnemy
+      range: 10
+      cooldown: 10
+      messageBroadcast: NAME Switches with TARGET.
+    5:
+      ability: SwitchHealth
+      trigger: onAbilityCycle
+      target: AreaEnemy
+      range: 10
+      cooldown: 10
+      messageBroadcast: NAME switches health with TARGET.
+    6:
+      ability: TeleportHere
+      trigger: onAbilityCycle
+      target: AreaEnemy
+      range: 10
+      cooldown: 10
+      messageBroadcast: NAME Teleports all nearby enemies to himself.   
+    7:
+      ability: TeleportTo
+      trigger: onAbilityCycle
+      target: AreaEnemy
+      range: 10
+      cooldown: 10
+      messageBroadcast: NAME Teleports to TARGET.
+    8:
+      ability: Whip
+      trigger: onAbilityCycle
+      target: AreaEnemy
+      range: 10
+      cooldown: 10
+      messageBroadcast: NAME Whips nearby enemies towards himself.
+      potency: 3
   delay: 3
   baseHealth: 50
   weapon: GOLDEN_SWORD
@@ -112,4 +141,23 @@ CorruptedPaladin:
   legs: GOLDEN_LEGGINGS
   boots: GOLDEN_BOOTS
   difficulty: 1
-  
+  drops: 
+    - item: BLAZE_ROD
+      probability: 0.1
+    - item: GOLDEN_SWORD
+      probability: 0.5
+RavagedPyroman:
+  type: wither_skeleton
+  baseHealth: 50
+  weapon: IRON_AXE
+  helmet: IRON_HELMET
+  chest: LEATHER_CHESTPLATE
+  legs: LEATHER_LEGGINGS
+  boots: IRON_BOOTS
+  difficulty: 1
+  drops: 
+    - item: BLAZE_ROD
+      probability: 0.1
+    - item: GOLDEN_SWORD
+      probability: 0.5
+  xp: 100

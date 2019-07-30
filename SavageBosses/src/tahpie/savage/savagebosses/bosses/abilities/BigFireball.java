@@ -65,7 +65,7 @@ public class BigFireball extends Ability{
 				if(target != null) {
 					dir = target.getLocation().subtract(fireball.getLocation()).toVector().normalize();
 				}
-				fireball.setVelocity(dir);									
+				fireball.setVelocity(dir.multiply(0.5));									
 			}
 		}
 		public void finalize() {
