@@ -19,18 +19,13 @@ import org.bukkit.potion.PotionEffectType;
 import org.bukkit.util.Vector;
 
 import com.gmail.nossr50.api.PartyAPI;
-import com.sk89q.worldedit.bukkit.BukkitAdapter;
-import com.sk89q.worldguard.protection.ApplicableRegionSet;
-import com.sk89q.worldguard.protection.flags.Flags;
-import com.sk89q.worldguard.protection.regions.RegionContainer;
-import com.sk89q.worldguard.protection.regions.RegionQuery;
 
 import net.md_5.bungee.api.ChatColor;
 import tahpie.savage.savagebosses.bosses.Boss;
 
 public class SavageUtility {
-	private static List<UUID> bossUUIDs = new ArrayList<UUID>();
-	private static List<UUID> customMobUUIDs = new ArrayList<UUID>();
+	private static List<Entity> bosses = new ArrayList<Entity>();
+	private static List<Entity> customMobs = new ArrayList<Entity>();
 
 	public SavageUtility() {}
 	
@@ -126,12 +121,6 @@ public class SavageUtility {
     		return null;
     	}
     } 
-    static boolean isPVPAllowed(LivingEntity player){
-        RegionContainer container = com.sk89q.worldguard.WorldGuard.getInstance().getPlatform().getRegionContainer();
-        RegionQuery query = container.createQuery();
-        ApplicableRegionSet set = query.getApplicableRegions(BukkitAdapter.adapt(player.getLocation()));
-        return set.testState(null, Flags.PVP);
-    }
 
     public static List<Player> getPartyMembers(Player player) {
     	if(PartyAPI.inParty(player)) {
@@ -141,37 +130,37 @@ public class SavageUtility {
     }
 
 	public static void despawnBosses() {
-		for(UUID bossID: getBossUUIDs()) {
-			Log.info("Removing: "+bossID+", "+Bukkit.getEntity(bossID).getName());
-			Bukkit.getEntity(bossID).remove();
+		for(Entity boss: getBosses()) {
+			Log.info("Removing: "+boss.getName());
+			boss.remove();
 			Log.info("REMOVED");
 		}
-		for(UUID customMobID: getCustomMobIDs()) {
-			Log.info("Removing: "+customMobID+", "+Bukkit.getEntity(customMobID).getName());
-			Boss.bosses.get(Bukkit.getEntity(customMobID)).destroy();
+		for(Entity customMob: getCustomMobs()) {
+			Log.info("Removing: "+customMob.getName());
+			Boss.bosses.get(customMob).destroy();
 			Log.info("REMOVED");
 		}
 	}
-	private static List<UUID> getCustomMobIDs() {
-		return new ArrayList<UUID>(customMobUUIDs );
+	private static List<Entity> getCustomMobs() {
+		return new ArrayList<Entity>(customMobs );
 	}
 
-	public static List<UUID> getBossUUIDs() {
-		return new ArrayList<UUID>(bossUUIDs);
+	public static List<Entity> getBosses() {
+		return new ArrayList<Entity>(bosses);
 	}
 
-	public static void addBossUUID(UUID uniqueID) {
-		bossUUIDs.add(uniqueID);
+	public static void addBoss(Entity boss) {
+		bosses.add(boss);
 	}
 
-	public static void removeBossUUID(UUID uniqueID) {
-		bossUUIDs.remove(uniqueID);
+	public static void removeBoss(Entity boss) {
+		bosses.remove(boss);
 	}
 
-	public static void addCustomMobID(UUID uniqueId) {
-		customMobUUIDs.add(uniqueId);
+	public static void addCustomMob(Entity mob) {
+		customMobs.add(mob);
 	}
-	public static void removeCustomMobID(UUID uniqueId) {
-		customMobUUIDs.remove(uniqueId);
+	public static void removeCustomMob(Entity mob) {
+		customMobs.remove(mob);
 	}
 }

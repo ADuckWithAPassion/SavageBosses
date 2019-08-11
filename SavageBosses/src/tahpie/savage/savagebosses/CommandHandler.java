@@ -8,7 +8,7 @@ import org.bukkit.Location;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
-import org.bukkit.craftbukkit.v1_14_R1.CraftWorld;
+import org.bukkit.craftbukkit.v1_8_R3.CraftWorld;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Fireball;
 import org.bukkit.entity.LivingEntity;
@@ -17,11 +17,12 @@ import org.bukkit.entity.Projectile;
 import org.bukkit.event.Listener;
 import org.bukkit.util.Vector;
 
-import net.minecraft.server.v1_14_R1.WorldServer;
+import net.minecraft.server.v1_8_R3.Enchantment;
+import net.minecraft.server.v1_8_R3.WorldServer;
 import tahpie.savage.savagebosses.bosses.GenericBoss;
-import tahpie.savage.savagebosses.bosses.HoardingPanda;
 import tahpie.savage.savagebosses.bosses.Twiggy;
 import tahpie.savage.savagebosses.bosses.abilities.BigFireball;
+import tahpie.savage.savagebosses.questitems.GenericItem;
 
 public class CommandHandler implements Listener, CommandExecutor{
 	SavageBosses SB;
@@ -61,10 +62,6 @@ public class CommandHandler implements Listener, CommandExecutor{
 							new Twiggy(player, world, SB);
 							return true;
 						}
-						else if(args[1].equalsIgnoreCase("hoardingpanda")) {						
-							new HoardingPanda(player, world, SB);
-							return true;
-						}
 						else if(args[1].equalsIgnoreCase("lostberserker")) {
 							SB.bossMap.get("LostBerserker").spawn(player.getLocation());
 							return true;
@@ -79,6 +76,18 @@ public class CommandHandler implements Listener, CommandExecutor{
 						}
 					}
 				}
+				else if(args.length == 3) {
+					if(args[0].equalsIgnoreCase("item")) {
+						for(int i=0; i<9; i++) {
+							player.getWorld().dropItemNaturally(player.getLocation(), GenericItem.getItem(args[1],Integer.parseInt(args[2])));		
+						}
+						return true;
+					}
+					else {
+						
+					}
+				}
+
 			}
 			SavageUtility.displayMessage(ChatColor.AQUA+"Please use correct syntax. "+ChatColor.GOLD+"/boss help.", player);
 		}

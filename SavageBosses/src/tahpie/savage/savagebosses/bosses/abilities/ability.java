@@ -1,26 +1,15 @@
 package tahpie.savage.savagebosses.bosses.abilities;
 
-import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.configuration.ConfigurationSection;
-import org.bukkit.craftbukkit.libs.jline.internal.Log;
-import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
-import org.bukkit.potion.PotionEffect;
-import org.bukkit.potion.PotionEffectType;
-
-import com.sk89q.worldedit.entity.Player;
-
-import net.minecraft.server.v1_14_R1.TextureType;
 import tahpie.savage.savagebosses.SavageBosses;
 import tahpie.savage.savagebosses.SavageUtility;
-import tahpie.savage.savagebosses.bosses.GenericBoss;
 import tahpie.savage.savagebosses.bosses.IndividualBoss;
 
 public abstract class Ability {
@@ -96,7 +85,12 @@ public abstract class Ability {
 		for(LivingEntity le: getTargets(event,IB)) {
 			names = names+le.getName()+", ";
 		}
-		names = names.substring(0, names.length()-2);
+		if(names.length() > 0) {
+			names = names.substring(0, names.length()-2);	
+		}
+		else {
+			name = "Nobody";
+		}
 		newMessage = newMessage.replaceAll("TARGET", ChatColor.GOLD+names+ChatColor.GREEN);	
 		return newMessage;
 	}

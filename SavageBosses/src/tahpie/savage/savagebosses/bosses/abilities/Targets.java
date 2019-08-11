@@ -8,7 +8,6 @@ import org.bukkit.entity.LivingEntity;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
 
 import tahpie.savage.savagebosses.SavageUtility;
-import tahpie.savage.savagebosses.bosses.GenericBoss;
 import tahpie.savage.savagebosses.bosses.IndividualBoss;
 
 public enum Targets {

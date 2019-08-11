@@ -9,13 +9,18 @@ import org.bukkit.craftbukkit.libs.jline.internal.Log;
 import org.bukkit.event.Listener;
 import org.bukkit.plugin.java.JavaPlugin;
 
+import net.minecraft.server.v1_8_R3.EntitySkeleton;
 import tahpie.savage.savagebosses.bosses.Boss;
 import tahpie.savage.savagebosses.bosses.GenericBoss;
+import tahpie.savage.savagebosses.bosses.NMSUtils;
+import tahpie.savage.savagebosses.bosses.Twiggy;
+import tahpie.savage.savagebosses.questitems.GenericItem;
 import tahpie.savage.savagebosses.questitems.SpecialItem;
 
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Objects;
@@ -38,6 +43,7 @@ public class SavageBosses extends JavaPlugin implements Listener{
 		Objects.requireNonNull(this.getCommand("boss")).setExecutor(new CommandHandler(this));
         getServer().getPluginManager().registerEvents(new Boss(this), this);
 		getLogger().info("enabled!");
+		NMSUtils.registerEntity("Skeleton", 51, EntitySkeleton.class, Twiggy.class);
 		createItemConfig();
 		createBossConfig();
 		loadCustomItems();
@@ -53,6 +59,9 @@ public class SavageBosses extends JavaPlugin implements Listener{
         itemConfigFile = new File(getDataFolder(), "items.yml");
         if (!itemConfigFile.exists()) {
             boolean fileMade = itemConfigFile.getParentFile().mkdirs();
+            if(fileMade) {
+            	Log.info("MAKING SAVAGE BOSSES ITEMS.YML");
+            }
             saveResource("items.yml", false);
         }
 
@@ -68,6 +77,9 @@ public class SavageBosses extends JavaPlugin implements Listener{
         bossConfigFile = new File(getDataFolder(), "bosses.yml");
         if (!bossConfigFile.exists()) {
             boolean fileMade = bossConfigFile.getParentFile().mkdirs();
+            if(fileMade) {
+            	Log.info("MAKING SAVAGE BOSSES BOSSES.YML");
+            }
             saveResource("bosses.yml", false);
         }
 
@@ -98,7 +110,7 @@ public class SavageBosses extends JavaPlugin implements Listener{
     		int chance = itemConfig.getInt(itemKey+".chance");
     		String effect = itemConfig.getString(itemKey+".effect");
     		
-    		itemMap.put(name, new SpecialItem(name, mat, enchantmentList, rarityInt, explosionString, tag, boss, killer, chance, effect));
+    		itemMap.put(name, new SpecialItem(name, mat, enchantmentList, rarityInt, explosionString, tag, effect));
     	}
     }
     public void loadCustomBosses() {

@@ -1,20 +1,9 @@
 package tahpie.savage.savagebosses.bosses.abilities;
 
-import java.util.List;
-
-import org.bukkit.ChatColor;
-import org.bukkit.attribute.Attribute;
 import org.bukkit.configuration.ConfigurationSection;
-import org.bukkit.craftbukkit.libs.jline.internal.Log;
-import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
-import org.bukkit.potion.PotionEffect;
-import org.bukkit.potion.PotionEffectType;
-
 import tahpie.savage.savagebosses.SavageBosses;
-import tahpie.savage.savagebosses.SavageUtility;
-import tahpie.savage.savagebosses.bosses.GenericBoss;
 import tahpie.savage.savagebosses.bosses.IndividualBoss;
 
 public class Heal extends Ability{
@@ -26,7 +15,7 @@ public class Heal extends Ability{
 		super.apply(event,IB);
 		
 		for(LivingEntity target: getTargets(event,IB)) {
-			target.setHealth(Math.min(target.getAttribute(Attribute.GENERIC_MAX_HEALTH).getValue(), target.getHealth()+getPotency()));
+			target.setHealth(Math.min(target.getMaxHealth(), target.getHealth()+getPotency()));
 		}
 		return true;
 	}

@@ -3,6 +3,7 @@ package tahpie.savage.savagebosses.bosses;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Random;
 
@@ -18,11 +19,7 @@ import org.bukkit.block.CreatureSpawner;
 import org.bukkit.block.Sign;
 import org.bukkit.FireworkEffect.Type;
 import org.bukkit.craftbukkit.libs.jline.internal.Log;
-import org.bukkit.craftbukkit.v1_14_R1.CraftWorld;
-import org.bukkit.craftbukkit.v1_14_R1.block.CraftCreatureSpawner;
-import org.bukkit.craftbukkit.v1_14_R1.entity.CraftEntity;
-import org.bukkit.craftbukkit.v1_14_R1.entity.CraftPanda;
-import org.bukkit.craftbukkit.v1_14_R1.entity.CraftPlayer;
+import org.bukkit.craftbukkit.v1_8_R3.entity.CraftPlayer;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.ExperienceOrb;
 import org.bukkit.entity.Firework;
@@ -34,7 +31,6 @@ import org.bukkit.event.block.Action;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.event.entity.EntityDeathEvent;
-import org.bukkit.event.entity.EntitySpawnEvent;
 import org.bukkit.event.entity.SpawnerSpawnEvent;
 import org.bukkit.event.entity.EntityDamageEvent.DamageCause;
 import org.bukkit.event.player.PlayerInteractEvent;
@@ -45,9 +41,6 @@ import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 import org.bukkit.util.Vector;
 
-import net.minecraft.server.v1_14_R1.EntityTypes;
-import savageclasses.Marksman;
-import savageclasses.Cooldown;
 import tahpie.savage.savagebosses.SavageBosses;
 import tahpie.savage.savagebosses.SavageUtility;
 
@@ -55,23 +48,42 @@ public class Boss implements Listener{
 	Random random;
 	private List<DamageCause> disallowedDamage;
 	private List<DamageCause> reducedDamage;
-	private Cooldown globalItemCooldown;
+	private apallo.savage.savageclasses.Cooldown globalItemCooldown;
 	public static HashMap<LivingEntity,IndividualBoss> bosses = new HashMap<LivingEntity, IndividualBoss>();
 	private SavageBosses SB;
-	
+	List<ChatColor> explosionColours = Arrays.asList(ChatColor.AQUA, ChatColor.BLACK, ChatColor.BLUE, ChatColor.DARK_BLUE, ChatColor.DARK_GREEN, ChatColor.DARK_PURPLE, ChatColor.RED, ChatColor.GOLD, ChatColor.DARK_GRAY, ChatColor.GREEN, ChatColor.LIGHT_PURPLE, ChatColor.WHITE, ChatColor.YELLOW, ChatColor.GRAY);
+	List<DyeColor> explosionFireworks = Arrays.asList(DyeColor.CYAN,DyeColor.BLACK,DyeColor.LIGHT_BLUE, DyeColor.BLUE, DyeColor.GREEN, DyeColor.PURPLE, DyeColor.RED, DyeColor.ORANGE, DyeColor.GRAY,DyeColor.LIME, DyeColor.PINK, DyeColor.WHITE, DyeColor.YELLOW, DyeColor.SILVER);
+	HashMap<String, DyeColor> explosionDye = new HashMap<String, DyeColor>();
+
 	public Boss(SavageBosses SB) {
+		explosionDye.put("AQUA", DyeColor.CYAN);
+		explosionDye.put("BLACK", DyeColor.BLACK);
+		explosionDye.put("BLUE", DyeColor.LIGHT_BLUE);
+		explosionDye.put("DARK_BLUE", DyeColor.BLUE);
+		explosionDye.put("DARK_PURPLE", DyeColor.PURPLE);
+		explosionDye.put("RED", DyeColor.RED);
+		explosionDye.put("GOLD", DyeColor.ORANGE);
+		explosionDye.put("DARK_GRAY", DyeColor.GRAY);
+		explosionDye.put("GREEN", DyeColor.GREEN);
+		explosionDye.put("LIGHT_PURPLE", DyeColor.PINK);
+		explosionDye.put("WHITE", DyeColor.WHITE);
+		explosionDye.put("YELLOW", DyeColor.YELLOW);
+		explosionDye.put("GRAY", DyeColor.SILVER);
+
 		this.SB = SB;
 		random = new Random();
 		disallowedDamage = Arrays.asList(DamageCause.BLOCK_EXPLOSION,DamageCause.ENTITY_EXPLOSION, DamageCause.LAVA, DamageCause.FALL);
 		reducedDamage = Arrays.asList(DamageCause.PROJECTILE, DamageCause.FIRE);
-		globalItemCooldown = new Cooldown(1000*6);
+		globalItemCooldown = new apallo.savage.savageclasses.Cooldown(1000*6);
 		Bukkit.getScheduler().scheduleSyncRepeatingTask(SB, new ensureNearbySpawn(), 20*10, 20*10);
 	}
 	public static void registerBoss(IndividualBoss boss) {
 		bosses.put(boss.getParent(), boss);
 	}
 	public static void unRegisterBoss(IndividualBoss boss) {
+		Log.info(bosses);
 		bosses.remove(boss.getParent());
+		Log.info(bosses);
 	}
 	@EventHandler
 	public void onAttack(EntityDamageByEntityEvent event){
@@ -97,13 +109,13 @@ public class Boss implements Listener{
 	@EventHandler
 	public void onSpawn(SpawnerSpawnEvent event) {
 		CreatureSpawner spawner = event.getSpawner();
-		CraftCreatureSpawner craftSpawner = ((CraftCreatureSpawner)spawner);
-		craftSpawner.setSpawnCount(2);
+		//CraftCreatureSpawner craftSpawner = ((CraftCreatureSpawner)spawner);
 		Entity entity = event.getEntity();
 		Block block = spawner.getWorld().getBlockAt(spawner.getLocation().subtract(0, 1, 0));
-		if(block.getBlockData().getMaterial().equals(Material.OAK_SIGN)) {
+		if(block.getType().equals(Material.SIGN_POST)) {
 			Sign sign = (Sign)block.getState(); 
 			String text = sign.getLine(0);
+			Log.info(SB.getBosses());
 			if(SB.getBosses().containsKey(text)) {
 				int count = 0;
 				for(Entity nearby : entity.getNearbyEntities(10, 10, 10)) {
@@ -128,8 +140,8 @@ public class Boss implements Listener{
 			LivingEntity dead = (LivingEntity)event.getEntity();
 			if(bosses.containsKey(dead)){
 				event.setDroppedExp(bosses.get(dead).getExp());
-                int xp = (int) bosses.get(dead).getExp();
-                ((ExperienceOrb)dead.getWorld().spawn(dead.getLocation(), ExperienceOrb.class)).setExperience(xp);
+				int xp = (int) bosses.get(dead).getExp();
+				((ExperienceOrb)dead.getWorld().spawn(dead.getLocation(), ExperienceOrb.class)).setExperience(xp);
 				bosses.get(dead).getDrop();
 				bosses.get(dead).destroy();				
 			}
@@ -144,20 +156,17 @@ public class Boss implements Listener{
 			else if(reducedDamage.contains(event.getCause())) {
 				event.setDamage(event.getDamage()*0.1);
 			}
-			CraftEntity craftEntity = (CraftEntity)event.getEntity();
-			if(craftEntity.getHandle() instanceof HoardingPanda) {
-				HoardingPanda panda = (HoardingPanda) ((CraftPanda) event.getEntity()).getHandle();
-				panda.hurt(event);
-			}
-			if(craftEntity.getHandle() instanceof Twiggy) {
-				Log.info("B");
-			}
+			//CraftEntity craftEntity = (CraftEntity)event.getEntity();
+			//			if(craftEntity.getMetadata("boss").equals(true)) {
+			//				Twiggy twiggy = (Twiggy) ((Twiggy) event.getEntity()).getHandle();
+			//				twiggy.hurt(event);
+			//			}
 		}
 	}
 	@EventHandler
 	public void fireworkExplosion(PlayerInteractEvent event) {
 		Player player = event.getPlayer();
-		ItemStack item = player.getInventory().getItemInMainHand();
+		ItemStack item = player.getInventory().getItemInHand();
 		if(item.hasItemMeta()) {
 			ItemMeta meta = item.getItemMeta();
 			if(meta.hasLore()) {
@@ -173,7 +182,7 @@ public class Boss implements Listener{
 							Log.info(colour);
 							Firework firework = player.getWorld().spawn(player.getLocation().add(0.5, 1, 0.5), Firework.class);
 							FireworkMeta data = (FireworkMeta) firework.getFireworkMeta();
-							data.addEffects(FireworkEffect.builder().withColor(DyeColor.valueOf(colour).getFireworkColor()).with(Type.BALL_LARGE).build());
+							data.addEffects(FireworkEffect.builder().withColor(explosionDye.get(colour).getFireworkColor()).with(Type.BALL_LARGE).build());
 							data.setPower(1);
 							firework.setFireworkMeta(data);
 						}	
@@ -191,9 +200,6 @@ public class Boss implements Listener{
 						else if(lore.get(5).contains("fire ticks")){
 							pyrosFlame(item, player);
 						}
-						else if(lore.get(5).contains("ride")) {
-							beastsEscape(item, player);
-						}
 						else if(lore.get(5).contains("leap")) {
 							marksmansLeap(item, player);
 						}
@@ -208,11 +214,13 @@ public class Boss implements Listener{
 		@Override
 		public void run() {
 			for(Entry<LivingEntity, IndividualBoss> entry: new HashMap<LivingEntity, IndividualBoss>(bosses).entrySet()) {
+				Log.info(new HashMap<LivingEntity, IndividualBoss>(bosses).entrySet());
+				Log.info(entry);
 				if(entry.getValue().getSpawn().distance(entry.getKey().getLocation())>=20) {
 					SavageUtility.broadcastMessage(ChatColor.DARK_GRAY+entry.getValue().getName()+": I have wandered too far...", entry.getKey().getLocation(), 15);
 					entry.getValue().destroy();
 				}
-				else if(entry.getKey().getTicksLived() >= 20*100) {
+				else if(entry.getKey().getTicksLived() >= 20*10) {
 					SavageUtility.broadcastMessage(ChatColor.DARK_GRAY+entry.getValue().getName()+": I am too old...", entry.getKey().getLocation(), 15);
 					entry.getValue().destroy();	
 				}
@@ -221,40 +229,40 @@ public class Boss implements Listener{
 	}
 	private void marksmansLeap(ItemStack item, Player player) {
 		if(globalItemCooldown.isOnCooldown(player)) {
-            SavageUtility.displayMessage(ChatColor.RED + "You cannot use " + ChatColor.GOLD + "Custom Items " + ChatColor.RED + "again for " + ChatColor.AQUA + globalItemCooldown.getRemainingTime(player) + ChatColor.RED + " seconds.", player);
+			SavageUtility.displayMessage(ChatColor.RED + "You cannot use " + ChatColor.GOLD + "Custom Items " + ChatColor.RED + "again for " + ChatColor.AQUA + globalItemCooldown.getRemainingTime(player) + ChatColor.RED + " seconds.", player);
 			return;
 		}
 		item.setAmount(item.getAmount()-1);
-        SavageUtility.broadcastMessage(player.getName() + "&6 leaps away!", player.getLocation(), 15);
-        Vector v = player.getLocation().getDirection();
-        double leapVelocity = 4.444444444444445;
-        double leapYVelocity = 1.4285714285714286;
+		SavageUtility.broadcastMessage(player.getName() + "&6 leaps away!", player.getLocation(), 15);
+		Vector v = player.getLocation().getDirection();
+		double leapVelocity = 4.444444444444445;
+		double leapYVelocity = 1.4285714285714286;
 
-        v.setY(0).normalize().multiply(leapVelocity).setY(leapYVelocity);
-        player.setVelocity(v);
+		v.setY(0).normalize().multiply(leapVelocity).setY(leapYVelocity);
+		player.setVelocity(v);
 
-        player.playSound(player.getLocation(), Sound.ENTITY_PLAYER_SMALL_FALL, 25.0F, 25.0F);
-        player.playEffect(EntityEffect.WOLF_SMOKE);
-        player.addPotionEffect(new PotionEffect(PotionEffectType.SPEED, 60, 2));
-        player.addPotionEffect(new PotionEffect(PotionEffectType.JUMP, 60, 2));
+		player.playSound(player.getLocation(), Sound.FALL_SMALL, 25.0F, 25.0F);
+		player.playEffect(EntityEffect.WOLF_SMOKE);
+		player.addPotionEffect(new PotionEffect(PotionEffectType.SPEED, 60, 2));
+		player.addPotionEffect(new PotionEffect(PotionEffectType.JUMP, 60, 2));
 
-        Marksman.isLeaping.add(player.getName());
-        globalItemCooldown.addCooldown(player);
-        
+		//apallo.savage.savageclasses.Marksman.isLeaping.add(player.getName());
+		globalItemCooldown.addCooldown(player);
+
 		SavageUtility.broadcastMessage(ChatColor.GOLD+player.getName()+ChatColor.AQUA+" Uses "+ChatColor.DARK_PURPLE+"Marksman's Leap"+ChatColor.AQUA+" to fly across the skies.", player.getLocation(), 15);		
 	}
-	private void beastsEscape(ItemStack item, Player player) {
-		if(globalItemCooldown.isOnCooldown(player)) {
-            SavageUtility.displayMessage(ChatColor.RED + "You cannot use " + ChatColor.GOLD + "Custom Items " + ChatColor.RED + "again for " + ChatColor.AQUA + globalItemCooldown.getRemainingTime(player) + ChatColor.RED + " seconds.", player);
-			return;
-		}
-		item.setAmount(item.getAmount()-1);
-		SavageUtility.broadcastMessage(ChatColor.GOLD+player.getName()+ChatColor.AQUA+" Uses "+ChatColor.DARK_PURPLE+"Beast's Escape"+ChatColor.AQUA+" to summon a fast Pwnda.", player.getLocation(), 15);
-        new Beast(EntityTypes.PANDA, ((CraftWorld)(player.getWorld())).getHandle(), player);
-	}
+	//	private void beastsEscape(ItemStack item, Player player) {
+	//		if(globalItemCooldown.isOnCooldown(player)) {
+	//            SavageUtility.displayMessage(ChatColor.RED + "You cannot use " + ChatColor.GOLD + "Custom Items " + ChatColor.RED + "again for " + ChatColor.AQUA + globalItemCooldown.getRemainingTime(player) + ChatColor.RED + " seconds.", player);
+	//			return;
+	//		}
+	//		item.setAmount(item.getAmount()-1);
+	//		SavageUtility.broadcastMessage(ChatColor.GOLD+player.getName()+ChatColor.AQUA+" Uses "+ChatColor.DARK_PURPLE+"Beast's Escape"+ChatColor.AQUA+" to summon a fast Pwnda.", player.getLocation(), 15);
+	//        new Beast(EntityTypes.PANDA, ((CraftWorld)(player.getWorld())).getHandle(), player);
+	//	}
 	private void pyrosFlame(ItemStack item, Player player) {
 		if(globalItemCooldown.isOnCooldown(player)) {
-            SavageUtility.displayMessage(ChatColor.RED + "You cannot use " + ChatColor.GOLD + "Custom Items " + ChatColor.RED + "again for " + ChatColor.AQUA + globalItemCooldown.getRemainingTime(player) + ChatColor.RED + " seconds.", player);
+			SavageUtility.displayMessage(ChatColor.RED + "You cannot use " + ChatColor.GOLD + "Custom Items " + ChatColor.RED + "again for " + ChatColor.AQUA + globalItemCooldown.getRemainingTime(player) + ChatColor.RED + " seconds.", player);
 			return;
 		}
 		Player target = (Player) SavageUtility.getInfront(player, 15, Player.class, "notInParty");
@@ -268,7 +276,7 @@ public class Boss implements Listener{
 	}
 	public void reveal(ItemStack item, Player player) {
 		if(globalItemCooldown.isOnCooldown(player)) {
-            SavageUtility.displayMessage(ChatColor.RED + "You cannot use " + ChatColor.GOLD + "Custom Items " + ChatColor.RED + "again for " + ChatColor.AQUA + globalItemCooldown.getRemainingTime(player) + ChatColor.RED + " seconds.", player);
+			SavageUtility.displayMessage(ChatColor.RED + "You cannot use " + ChatColor.GOLD + "Custom Items " + ChatColor.RED + "again for " + ChatColor.AQUA + globalItemCooldown.getRemainingTime(player) + ChatColor.RED + " seconds.", player);
 			return;
 		}
 		item.setAmount(item.getAmount()-1);
@@ -276,15 +284,15 @@ public class Boss implements Listener{
 		for(Entity nearby: SavageUtility.getNearbyEntities(player, 15, Player.class, false)) {
 			if(!(SavageUtility.getPartyMembers((Player)nearby).contains(player))) {
 				((Player)nearby).damage(1);
-				((Player)nearby).addPotionEffect(new PotionEffect(PotionEffectType.GLOWING, 20*5, 1));
-				SavageUtility.displayMessage(ChatColor.AQUA+"Your skin glows brightly.", nearby);
+				nearby.getWorld().playSound(nearby.getLocation(), Sound.ANVIL_BREAK, 10, 10);
+				SavageUtility.displayMessage(ChatColor.AQUA+"You make a loud noise.", nearby);
 			}
 		}
 		globalItemCooldown.addCooldown(player);
 	}
 	public void paladinsAura(ItemStack item, Player player) {
 		if(globalItemCooldown.isOnCooldown(player)) {
-            SavageUtility.displayMessage(ChatColor.RED + "You cannot use " + ChatColor.GOLD + "Custom Items " + ChatColor.RED + "again for " + ChatColor.AQUA + globalItemCooldown.getRemainingTime(player) + ChatColor.RED + " seconds.", player);
+			SavageUtility.displayMessage(ChatColor.RED + "You cannot use " + ChatColor.GOLD + "Custom Items " + ChatColor.RED + "again for " + ChatColor.AQUA + globalItemCooldown.getRemainingTime(player) + ChatColor.RED + " seconds.", player);
 			return;
 		}
 		item.setAmount(item.getAmount()-1);
@@ -294,7 +302,7 @@ public class Boss implements Listener{
 	}
 	public void bardsBuff(ItemStack item, Player player) {
 		if(globalItemCooldown.isOnCooldown(player)) {
-            SavageUtility.displayMessage(ChatColor.RED + "You cannot use " + ChatColor.GOLD + "Custom Items " + ChatColor.RED + "again for " + ChatColor.AQUA + globalItemCooldown.getRemainingTime(player) + ChatColor.RED + " seconds.", player);
+			SavageUtility.displayMessage(ChatColor.RED + "You cannot use " + ChatColor.GOLD + "Custom Items " + ChatColor.RED + "again for " + ChatColor.AQUA + globalItemCooldown.getRemainingTime(player) + ChatColor.RED + " seconds.", player);
 			return;
 		}
 		item.setAmount(item.getAmount()-1);

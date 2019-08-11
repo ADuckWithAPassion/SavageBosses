@@ -7,7 +7,7 @@
   rarityInt: 5
   explosionString: BLUE
   tag: Touched By Twiggy
-  boss: Hoarding Panda
+  boss: Twiggy
   killer: TahPie
   chance: 0
   effect: null
@@ -19,19 +19,19 @@
   rarityInt: 6
   explosionString: null
   tag: null
-  boss: Hoarding Panda
+  boss: Twiggy
   killer: TahPie
   chance: 0
   effect: Consume to&a buff&5&o your party.
 3:
   name: Assassin's Bane
-  mat: BAMBOO
+  mat: MILK_BUCKET
   enchantmentList: 
     SILK_TOUCH: 3
   rarityInt: 6
   explosionString: null
   tag: null
-  boss: Hoarding Panda
+  boss: Twiggy
   killer: TahPie
   chance: 0
   effect: Consume to&a reveal&5&o nearby invisible assassins.
@@ -43,7 +43,7 @@
   rarityInt: 6
   explosionString: null
   tag: null
-  boss: Hoarding Panda
+  boss: Twiggy
   killer: TahPie
   chance: 0
   effect: Consume to gain&a invincibility&5&o for 5 seconds.
@@ -55,31 +55,19 @@
   rarityInt: 6
   explosionString: null
   tag: null
-  boss: Hoarding Panda
+  boss: Twiggy
   killer: TahPie
   chance: 0
   effect: Right click to apply&a fire ticks&5&o to a target.
 6:
-  name: Beast's Escape
-  mat: LEAD
-  enchantmentList: 
-    SILK_TOUCH: 3
-  rarityInt: 6
-  explosionString: null
-  tag: null
-  boss: Hoarding Panda
-  killer: TahPie
-  chance: 0
-  effect: Consume to&a ride&5&o the beasts pet.
-7:
   name: Marksman's Leap
-  mat: LILY_PAD
+  mat: WATER_LILY
   enchantmentList: 
     SILK_TOUCH: 3
   rarityInt: 6
   explosionString: null
   tag: null
-  boss: Hoarding Panda
+  boss: Twiggy
   killer: TahPie
   chance: 0
   effect: Consume to&a leap&5&o across the skies.

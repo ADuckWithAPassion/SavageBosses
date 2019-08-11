@@ -8,15 +8,13 @@ import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.Material;
-import org.bukkit.attribute.Attribute;
 import org.bukkit.craftbukkit.libs.jline.internal.Log;
-import org.bukkit.craftbukkit.v1_14_R1.entity.CraftLivingEntity;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.metadata.FixedMetadataValue;
 
-import net.minecraft.server.v1_14_R1.EntityLiving;
+import net.minecraft.server.v1_8_R3.AttributeBase;
 import tahpie.savage.savagebosses.SavageBosses;
 import tahpie.savage.savagebosses.SavageUtility;
 import tahpie.savage.savagebosses.bosses.abilities.Ability;
@@ -32,30 +30,30 @@ public class IndividualBoss {
 	List<Ability> queuedOnAttackAbilities = new ArrayList<Ability>();
 	List<Ability> queuedOnAttackedAbilities = new ArrayList<Ability>();
 	List<Ability> abilities = new ArrayList<Ability>();
-	
+
 	public IndividualBoss(GenericBoss GB, Location spawnLocation, SavageBosses SB) {
 		this.GB = GB;
 		this.SB = SB;
 		this.spawnLocation = spawnLocation;
 		try {
 			parent = (LivingEntity)spawnLocation.getWorld().spawnEntity(spawnLocation, EntityType.valueOf(GB.getType().toUpperCase()));
-			parent.getAttribute(Attribute.GENERIC_MAX_HEALTH).setBaseValue(GB.getHealth());
-			parent.setHealth(parent.getAttribute(Attribute.GENERIC_MAX_HEALTH).getBaseValue());
+			parent.setMaxHealth(GB.getHealth());
+			parent.setHealth(GB.getHealth());
 			parent.setMetadata("boss", new FixedMetadataValue(SB, true));
 			parent.setCustomName(ChatColor.GOLD+GB.getName()+ChatColor.DARK_GREEN+StringUtils.repeat("✪",GB.getDifficulty()));
-			SavageUtility.addCustomMobID(parent.getUniqueId());
+			SavageUtility.addCustomMob(parent);
 		}
 		catch(NullPointerException error) {
 			Log.info("ENTITY TYPE NOT FOUND");
 		}
 		applyArmour();
-	 for(Ability ability: GB.getAbilities()) {
+		for(Ability ability: GB.getAbilities()) {
 			ability.addToQueue(3,this);
 		}
 		Boss.registerBoss(this);
 		abilityCycle = new cycle(Math.toIntExact(Math.round((Math.random()*10)+2)), this, SB);
-		}
-	
+	}
+
 	public LivingEntity getParent() {
 		return parent;
 	}
@@ -67,7 +65,7 @@ public class IndividualBoss {
 		parent.getEquipment().setChestplate(new ItemStack(Material.getMaterial(GB.getChest())));
 		parent.getEquipment().setLeggings(new ItemStack(Material.getMaterial(GB.getLegs())));
 		parent.getEquipment().setBoots(new ItemStack(Material.getMaterial(GB.getBoots())));
-		parent.getEquipment().setItemInMainHand(new ItemStack(Material.getMaterial(GB.getWeapon())));
+		parent.getEquipment().setItemInHand(new ItemStack(Material.getMaterial(GB.getWeapon())));
 	}
 	public void addAbilityToQueue(Ability ability) {
 		abilities.add(ability);
@@ -117,7 +115,7 @@ public class IndividualBoss {
 		}
 		abilityCycle.cancel();
 		Boss.unRegisterBoss(this);
-		SavageUtility.removeCustomMobID(parent.getUniqueId());
+		SavageUtility.removeCustomMob(parent);
 		parent.remove();
 		return;
 	}

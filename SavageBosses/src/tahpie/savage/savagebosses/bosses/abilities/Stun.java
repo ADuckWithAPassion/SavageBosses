@@ -1,7 +1,5 @@
 package tahpie.savage.savagebosses.bosses.abilities;
 
-import java.util.HashMap;
-
 import org.bukkit.ChatColor;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.entity.LivingEntity;
@@ -10,7 +8,6 @@ import org.bukkit.event.entity.EntityDamageByEntityEvent;
 
 import tahpie.savage.savagebosses.SavageBosses;
 import tahpie.savage.savagebosses.SavageUtility;
-import tahpie.savage.savagebosses.bosses.GenericBoss;
 import tahpie.savage.savagebosses.bosses.IndividualBoss;
 
 public class Stun extends Ability{
@@ -26,7 +23,7 @@ public class Stun extends Ability{
 				if(!(ChatColor.stripColor(message).equalsIgnoreCase("null"))) {
 					SavageUtility.displayMessage(message,target);
 				}
-				savageclasses.Stun.stunPlayer((Player)target, getDuration()*1000);
+				apallo.savage.savageclasses.Stun.stunPlayer((Player)target, getDuration()*1000);
 			}	
 		}
 		return false;
