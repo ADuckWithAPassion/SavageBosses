@@ -4,12 +4,15 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Random;
+
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.WordUtils;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.DyeColor;
 import org.bukkit.Material;
+import org.bukkit.craftbukkit.libs.jline.internal.Log;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
@@ -24,6 +27,7 @@ public class SpecialItem {
 	private ItemStack parent;
 	private String boss;
 	ItemMeta meta;
+	String rarity;
 	ArrayList<String> lore = new ArrayList<String>();
 	String line1 = " ";
 	String line2 = "";
@@ -33,12 +37,13 @@ public class SpecialItem {
 	String line6 = "";
 	String line7 = "";
 	String line8 = "";
+	private double chance;
 	
 	public SpecialItem(String name, String mat, HashMap<String, Integer> enchantmentList, int rarityInt, String explosionString, String tag, String effect) {
 		this.parent = new ItemStack(Material.getMaterial(mat));
 		meta = parent.getItemMeta();
 			
-		String rarity = rarityNames.get(rarityInt);
+		rarity = rarityNames.get(rarityInt);
 		ChatColor colour = rarityColours.get(rarityInt);
 		
 		meta.setDisplayName(colour+name);
@@ -103,6 +108,12 @@ public class SpecialItem {
 			line5 = ChatColor.LIGHT_PURPLE+"The killer of this boss: "+ChatColor.RED+player.getName();	
 		}
 	}
+	public void setChance(double chance) {
+		this.chance = chance;
+	}
+	public double getChance() {
+		return chance;
+	}
 	public String getBoss() {
 		return boss;
 	}
@@ -110,6 +121,10 @@ public class SpecialItem {
 		setKiller(killer);
 		setBoss(boss);
 		applyLore();
+		if(rarity == "Common") {
+			Log.info(parent.getDurability());
+			parent.setDurability((short)new Random().nextInt(parent.getType().getMaxDurability()));
+		}
 		return parent;
 	}
 }

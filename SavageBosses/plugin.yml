@@ -6,3 +6,7 @@ commands:
   boss:
     description: Savage Bosses
     usage: "Usage: /<command>"
+permissions:
+  savagebosses.bosses.manage:
+    description: Allows management of bosses.
+    default: op

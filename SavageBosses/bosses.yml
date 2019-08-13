@@ -2,7 +2,7 @@ LostBerserker:
   name: Lost Berserker
   type: zombie
   abilities: 
-    1:
+    1: 
       ability: Stun
       trigger: onAbilityCycle
       target: AreaEnemy
@@ -15,6 +15,7 @@ LostBerserker:
       messageBroadcast: NAME Roars at all nearby enemies, leaving them stunned.
       conditions:
         - targetNotStunCooldown
+      
     2:
       ability: Push
       trigger: onAttacked
@@ -29,7 +30,8 @@ LostBerserker:
       messageBroadcast: NAME Flings TARGET into the sky.
       conditions: 
         - targetNotStunned
-    3:
+        
+    3: 
       ability: Stun
       trigger: onAttack
       target: AttackedEnemy
@@ -42,6 +44,7 @@ LostBerserker:
       messageBroadcast: NAME Headbutts TARGET, stunning him for a few seconds.
       conditions: 
         - areaNotStunCooldown
+        
     4:
       ability: Buff
       trigger: onAbilityCycle
@@ -64,22 +67,14 @@ LostBerserker:
   drops: 
     - item: BLAZE_ROD
       probability: 0.1
-    - item: GOLDEN_SWORD
+    - item: GOLD_SWORD
       probability: 0.5
+  xp: 50
 CorruptedPaladin:
   name: Corrupted Paladin
   type: pig_zombie
-  abilities: 
-    1:
-      ability: BigFireball
-      trigger: onAbilityCycle
-      target: AreaEnemy
-      range: 10
-      duration: 3
-      cooldown: 10
-      potency: 20
-      messageBroadcast: NAME Calls to the nether for a big fireball.
-    2:
+  abilities:
+    1: 
       ability: Critical
       trigger: onAttack
       target: AttackedEnemy
@@ -90,42 +85,48 @@ CorruptedPaladin:
       messageBroadcast: NAME Crits TARGET.
       conditions: 
         - targetNotStunned
-    3:
+      
+    2: 
       ability: LittleFireball
       trigger: onAbilityCycle
       target: AreaEnemy
       range: 10
       cooldown: 10
       messageBroadcast: NAME Calls to the nether for a small fireball.
-    4:
+      
+    3: 
       ability: Switch
       trigger: onAttacked
       target: AttackingEnemy
       range: 10
       cooldown: 10
       messageBroadcast: NAME Switches with TARGET.
-    5:
+      
+    4:
       ability: SwitchHealth
       trigger: onAbilityCycle
       target: AreaEnemy
       range: 10
       cooldown: 10
       messageBroadcast: NAME switches health with TARGET.
-    6:
+      
+    5:
       ability: TeleportHere
       trigger: onAbilityCycle
       target: AreaEnemy
       range: 10
       cooldown: 10
       messageBroadcast: NAME Teleports all nearby enemies to himself.   
-    7:
+      
+    6: 
       ability: TeleportTo
       trigger: onAbilityCycle
       target: AreaEnemy
       range: 10
       cooldown: 10
       messageBroadcast: NAME Teleports to TARGET.
-    8:
+      
+    7:
       ability: Whip
       trigger: onAbilityCycle
       target: AreaEnemy
@@ -135,16 +136,16 @@ CorruptedPaladin:
       potency: 3
   delay: 3
   baseHealth: 50
-  weapon: GOLDEN_SWORD
-  helmet: GOLDEN_HELMET
-  chest: GOLDEN_CHESTPLATE
-  legs: GOLDEN_LEGGINGS
-  boots: GOLDEN_BOOTS
+  weapon: GOLD_SWORD
+  helmet: GOLD_HELMET
+  chest: GOLD_CHESTPLATE
+  legs: GOLD_LEGGINGS
+  boots: GOLD_BOOTS
   difficulty: 1
   drops: 
     - item: BLAZE_ROD
       probability: 0.1
-    - item: GOLDEN_SWORD
+    - item: GOLD_SWORD
       probability: 0.5
 RavagedPyroman:
   type: wither_skeleton
@@ -158,6 +159,70 @@ RavagedPyroman:
   drops: 
     - item: BLAZE_ROD
       probability: 0.1
-    - item: GOLDEN_SWORD
+    - item: GOLD_SWORD
       probability: 0.5
-  xp: 100
+  xp: 30
+TwiggysGuard:
+  name: Twiggys Guard
+  type: skeleton
+  abilities:
+    1: 
+      ability: Switch
+      trigger: onAttacked
+      target: AttackingEnemy
+      range: 10
+      cooldown: 15
+      messageBroadcast: NAME Switches with TARGET.
+    2:
+      ability: Whip
+      trigger: onAttacked
+      target: AreaEnemy
+      range: 10
+      cooldown: 15
+      messageBroadcast: NAME Throw enemies back.
+  delay: 5
+  baseHealth: 25
+  weapon: IRON_SWORD
+  helmet: GOLD_HELMET
+  chest: IRON_CHESTPLATE
+  legs: IRON_LEGGINGS
+  boots: IRON_BOOTS
+  difficulty: 1
+  drops: 
+    - item: BOW
+      probability: 0.1
+    - item: FEATHER
+      probability: 0.9
+  xp: 30
+TwiggysArcher:
+  name: Twiggys Archer
+  type: skeleton
+  abilities:
+    1: 
+      ability: Switch
+      trigger: onAttacked
+      target: AttackingEnemy
+      range: 10
+      cooldown: 15
+      messageBroadcast: NAME Switches with TARGET.
+    2:
+      ability: Whip
+      trigger: onAttacked
+      target: AreaEnemy
+      range: 10
+      cooldown: 15
+      messageBroadcast: NAME Throw enemies back.
+  delay: 5
+  baseHealth: 25
+  weapon: BOW
+  helmet: GOLD_HELMET
+  chest: IRON_CHESTPLATE
+  legs: IRON_LEGGINGS
+  boots: IRON_BOOTS
+  difficulty: 1
+  drops: 
+    - item: BOW
+      probability: 0.1
+    - item: FEATHER
+      probability: 0.9
+  xp: 30

@@ -20,7 +20,7 @@ public class GenericItem {
 	static double random;
 	private static List<String> colours = Arrays.asList("AQUA","BLACK","BLUE","DARK_BLUE","DARK_PURPLE","RED","GOLD","GOLD","DARK_GRAY","GREEN","LIGHT_PURPLE","WHITE","YELLOW","GRAY");
 	
-	public static ItemStack getItem(String boss, int difficulty) {
+	public static ItemStack getItem(String boss, int difficulty, String killer) {
 		Log.info(colours);
 		random = Math.random();
 		Log.info(random);
@@ -30,13 +30,14 @@ public class GenericItem {
 		//10%,  20%,   30%,   40%,   50%,   60% (If you get a drop, chance it will be MAGICAL or better)
 		//1%,   3%,    5%,    10%,   15%,   25% (If you get a drop, chance it will be RARE or better)
 		//0%,   0%,    1%,    3%,    5%,    10% (If you get a drop, chance it will be EPIC or better)
-		//0%,   0%,    0%,    0%,    1%,    5% (If you get a drop, chance it will be LEGENDARY or better)
+		//0%,   0%,    0%,    0%,    0%,    0% (If you get a drop, chance it will be LEGENDARY or better)
 		List<Double>common    = Arrays.asList(0.80,1.00,1.00,1.00,1.00,1.00);
 		List<Double>uncommon  = Arrays.asList(0.60,1.00,1.00,1.00,1.00,1.00);
 		List<Double>magical   = Arrays.asList(0.10,0.20,0.30,0.40,0.50,0.60); // These values are cumulative probabilities 
 		List<Double>rare      = Arrays.asList(0.01,0.03,0.05,0.10,0.15,0.25); // Example: 15% chance to get a rare (or better) from a level 5 boss
 		List<Double>epic      = Arrays.asList(0.00,0.00,0.01,0.03,0.05,0.10); // Values should be decreasing further down the list (for obvious reasons)
-		List<Double>legendary = Arrays.asList(0.00,0.00,0.00,0.00,0.01,0.05); // Example: 0% chance to get an legendary from a level 1 boss
+		List<Double>legendary = Arrays.asList(0.00,0.00,0.00,0.00,0.00,0.00); // Example: 0% chance to get an legendary from a level 1 boss
+		// legendaries are not implemented yet
 		int rarity = -1; // trash
 		if(random<=common.get(difficulty-1)) {
 			rarity = 0; // common
@@ -57,7 +58,6 @@ public class GenericItem {
 			}
 		}
 		else { // NO DROP
-			
 		}
 		//1,    2,     3,     4,     5,     6 (Boss difficulty)
 		//10%,  10%,   10%,  10%,  10%,  10% (If you get a drop, chance it will be a SWORD)
@@ -70,15 +70,16 @@ public class GenericItem {
 		//10%,  10%,   10%,  10%,  10%,  10% (If you get a drop, chance it will be a BOOTS)
 		//0%,   0%,    0%,   0%,   0%,   0% (If you get a drop, chance it will be a BOW)
 		//0%,   0%,    0%,   0%,   0%,   0% (If you get a drop, chance it will be a FISHING ROD)
+		// bows/fishing rods are not implemented yet
 
-		List<Double>sword      = Arrays.asList(0.30,0.30,0.30,0.30,0.30,0.30);
-		List<Double>PICKAXE    = Arrays.asList(0.10,0.10,0.10,0.10,0.10,0.10);
+		List<Double>sword      = Arrays.asList(0.20,0.20,0.20,0.20,0.20,0.20);
+		List<Double>PICKAXE    = Arrays.asList(0.05,0.05,0.05,0.05,0.05,0.05);
 		List<Double>axe        = Arrays.asList(0.10,0.10,0.10,0.10,0.10,0.10); // These values are NOT cumulative probabilities 
-		List<Double>SPADE      = Arrays.asList(0.10,0.10,0.10,0.10,0.10,0.10); // These are exact probabilities
-		List<Double>helmet     = Arrays.asList(0.10,0.10,0.10,0.10,0.10,0.10); // Example: 10% chance to get a helmet from a level 1 boss
-		List<Double>chestplate = Arrays.asList(0.10,0.10,0.10,0.10,0.10,0.10); // Example: 10% chance to get a sword from a level 5 boss
-		List<Double>leggings   = Arrays.asList(0.10,0.10,0.10,0.10,0.10,0.10); // Columns must sum up to 1.00
-		List<Double>boots      = Arrays.asList(0.10,0.10,0.10,0.10,0.10,0.10); // No requirements for increasing/decreasing
+		List<Double>SPADE      = Arrays.asList(0.05,0.05,0.05,0.05,0.05,0.05); // These are exact probabilities
+		List<Double>helmet     = Arrays.asList(0.15,0.15,0.15,0.15,0.15,0.15); // Example: 10% chance to get a helmet from a level 1 boss
+		List<Double>chestplate = Arrays.asList(0.15,0.15,0.15,0.15,0.15,0.15); // Example: 10% chance to get a sword from a level 5 boss
+		List<Double>leggings   = Arrays.asList(0.15,0.15,0.15,0.15,0.15,0.15); // Columns must sum up to 1.00
+		List<Double>boots      = Arrays.asList(0.15,0.15,0.15,0.15,0.15,0.15); // No requirements for increasing/decreasing
 		List<Double>bow        = Arrays.asList(0.00,0.00,0.00,0.00,0.00,0.00);
 		List<Double>fishing    = Arrays.asList(0.00,0.00,0.00,0.00,0.00,0.00); 
 		String type = null;
@@ -107,6 +108,8 @@ public class GenericItem {
 		List<Double>medium = Arrays.asList(0.30,0.50,0.80,0.90,1.00,1.00); // These values are cumulative probabilities 
 		List<Double>good   = Arrays.asList(0.01,0.05,0.10,0.15,0.20,0.35); // Example: 15% chance to get diamond (or better) from a level 4 boss
 		String material = null;
+		random = Math.random();
+		Log.info(random);
 		if(random<=bad.get(difficulty-1)) {
 			if(Arrays.asList("Sword","PICKAXE","Axe","SPADE").contains(type)) {
 				if(Math.random()<=0.5) {
@@ -152,7 +155,9 @@ public class GenericItem {
 					}
 				}
 				if(random<=good.get(difficulty-1)) {
+					Log.info(type);
 					if(Arrays.asList("Sword","PICKAXE","Axe","SPADE","Helmet","Chestplate","Leggings","Boots").contains(type)) {
+						Log.info(type);
 						material = "Diamond";
 					}
 				}
@@ -175,7 +180,7 @@ public class GenericItem {
 		}
 		else if(rarity == 1) {
 			if(Arrays.asList("Sword","Axe").contains(type)) {
-				if(rand<=0.05) {
+				if(rand<=0.15) {
 					enchantmentList.put("DAMAGE_ALL", 1);
 					if(rand2<=0.33) {
 						prefix = "Jagged ";						
@@ -187,7 +192,7 @@ public class GenericItem {
 						prefix = "Rough ";
 					}
 				}
-				else if(rand<=0.25) {
+				else if(rand<=0.30) {
 					enchantmentList.put("DAMAGE_UNDEAD", 1);
 					if(rand2<=0.33) {
 						prefix = "Rotting ";						
@@ -211,7 +216,7 @@ public class GenericItem {
 						prefix = "Cheap ";
 					}
 				}
-				else if(rand<=0.50) {
+				else if(rand<=0.70) {
 					enchantmentList.put("KNOCKBACK", 1);
 					if(rand2<=0.33) {
 						prefix = "Shaky ";						
@@ -223,7 +228,7 @@ public class GenericItem {
 						prefix = "Reflective ";
 					}
 				}
-				else if(rand<=0.55) {
+				else if(rand<=0.85) {
 					enchantmentList.put("LOOT_BONUS_MOBS", 1);
 					if(rand2<=0.33) {
 						prefix = "Lucky ";						
@@ -261,7 +266,7 @@ public class GenericItem {
 						prefix = "Makeshift ";
 					}
 				}
-				else if(rand<=0.25) {
+				else if(rand<=0.20) {
 					enchantmentList.put("PROTECTION_ENVIRONMENTAL", 1);
 					if(rand2<=0.33) {
 						prefix = "Weak ";						
@@ -311,7 +316,7 @@ public class GenericItem {
 				}
 			}
 			if(Arrays.asList("PICKAXE","SPADE").contains(type)) {
-				if(rand<=0.05) {
+				if(rand<=0.30) {
 					enchantmentList.put("DIG_SPEED", 1);
 					if(rand2<=0.33) {
 						prefix = "Poor ";						
@@ -323,7 +328,7 @@ public class GenericItem {
 						prefix = "Split ";
 					}
 				}
-				else if(rand<=0.25) {
+				else if(rand<=0.70) {
 					enchantmentList.put("LOOT_BONUS_BLOCKS", 1);
 					if(rand2<=0.33) {
 						prefix = "Unfortunate ";						
@@ -352,7 +357,7 @@ public class GenericItem {
 		}
 		else if(rarity == 2) {
 			if(Arrays.asList("Sword","Axe").contains(type)) {
-				if(rand<=0.10) {
+				if(rand<=0.20) {
 					enchantmentList.put("DAMAGE_ALL", 1);
 					enchantmentList.put("KNOCKBACK", 1);
 					if(rand2<=0.33) {
@@ -365,7 +370,7 @@ public class GenericItem {
 						prefix = "Old ";
 					}
 				}
-				else if(rand<=0.20) {
+				else if(rand<=0.30) {
 					enchantmentList.put("DAMAGE_UNDEAD", 2);
 					if(rand2<=0.33) {
 						prefix = "Scary ";						
@@ -377,7 +382,7 @@ public class GenericItem {
 						prefix = "Discarded ";
 					}
 				}
-				else if(rand<=0.45) {
+				else if(rand<=0.50) {
 					enchantmentList.put("DAMAGE_ARTHROPODS", 2);
 					if(rand2<=0.33) {
 						prefix = "Crushed ";						
@@ -389,7 +394,7 @@ public class GenericItem {
 						prefix = "Webbed ";
 					}
 				}
-				else if(rand<=0.50) {
+				else if(rand<=0.70) {
 					enchantmentList.put("KNOCKBACK", 1);
 					enchantmentList.put("DURABILITY", 1);
 					if(rand2<=0.33) {
@@ -402,7 +407,7 @@ public class GenericItem {
 						prefix = "Aged ";
 					}
 				}
-				else if(rand<=0.55) {
+				else if(rand<=0.85) {
 					enchantmentList.put("LOOT_BONUS_MOBS", 2);
 					if(rand2<=0.33) {
 						prefix = "Farmer's ";						
@@ -428,7 +433,7 @@ public class GenericItem {
 				}
 			}
 			if(Arrays.asList("Helmet","Chestplate","Leggings","Boots").contains(type)) {
-				if(rand<=0.15) {
+				if(rand<=0.20) {
 					enchantmentList.put("DURABILITY", 2);
 					if(rand2<=0.33) {
 						prefix = "Resistant ";				
@@ -440,7 +445,7 @@ public class GenericItem {
 						prefix = "New ";
 					}
 				}
-				else if(rand<=0.25) {
+				else if(rand<=0.45) {
 					enchantmentList.put("PROTECTION_ENVIRONMENTAL", 1);
 					enchantmentList.put("DURABILITY", 2);
 					if(rand2<=0.33) {
@@ -453,7 +458,7 @@ public class GenericItem {
 						prefix = "Defending ";
 					}
 				}
-				else if(rand<=0.55) {
+				else if(rand<=0.60) {
 					enchantmentList.put("PROTECTION_PROJECTILE", 2);
 					enchantmentList.put("PROTECTION_FIRE", 1);
 					if(rand2<=0.33) {
@@ -481,7 +486,7 @@ public class GenericItem {
 				else {
 					enchantmentList.put("PROTECTION_EXPLOSIONS", 3);
 					if(rand2<=0.33) {
-						prefix = "Creeper's Bane ";						
+						prefix = "Creeper's Baneful ";						
 					}
 					else if(rand2<=0.66) {
 						prefix = "Raider's Delight ";
@@ -492,7 +497,7 @@ public class GenericItem {
 				}
 			}
 			if(Arrays.asList("PICKAXE","SPADE").contains(type)) {
-				if(rand<=0.05) {
+				if(rand<=0.35) {
 					enchantmentList.put("DIG_SPEED", 2);
 					if(rand2<=0.33) {
 						prefix = "Effective ";						
@@ -504,7 +509,7 @@ public class GenericItem {
 						prefix = "Efficient ";
 					}
 				}
-				else if(rand<=0.25) {
+				else if(rand<=0.70) {
 					enchantmentList.put("LOOT_BONUS_BLOCKS", 2);
 					if(rand2<=0.33) {
 						prefix = "Discovering ";						
@@ -533,7 +538,7 @@ public class GenericItem {
 		}
 		else if(rarity == 3) {
 			if(Arrays.asList("Sword","Axe").contains(type)) {
-				if(rand<=0.10) {
+				if(rand<=0.30) {
 					enchantmentList.put("DAMAGE_ALL", 3);
 					enchantmentList.put("LOOT_BONUS_MOBS", 1);
 					enchantmentList.put("DURABILITY", 1);
@@ -548,7 +553,7 @@ public class GenericItem {
 						prefix = "Lord's ";
 					}
 				}
-				else if(rand<=0.20) {
+				else if(rand<=0.40) {
 					enchantmentList.put("DAMAGE_UNDEAD", 4);
 					if(rand2<=0.33) {
 						prefix = "Zombie Slicing ";						
@@ -560,19 +565,19 @@ public class GenericItem {
 						prefix = "Infected";
 					}
 				}
-				else if(rand<=0.45) {
+				else if(rand<=0.50) {
 					enchantmentList.put("DAMAGE_ARTHROPODS", 4);
 					if(rand2<=0.33) {
 						prefix = "Spider Dissecting ";						
 					}
 					else if(rand2<=0.66) {
-						prefix = "Arachne's Bane ";
+						prefix = "Arachne's Baneful ";
 					}
 					else {
 						prefix = "Spider Swatting ";
 					}
 				}
-				else if(rand<=0.50) {
+				else if(rand<=0.75) {
 					enchantmentList.put("LOOT_BONUS_MOBS", 3);
 					enchantmentList.put("DURABILITY", 3);
 					if(rand2<=0.33) {
@@ -601,7 +606,7 @@ public class GenericItem {
 				}
 			}
 			if(Arrays.asList("Helmet","Chestplate","Leggings","Boots").contains(type)) {
-				if(rand<=0.15) {
+				if(rand<=0.35) {
 					enchantmentList.put("DURABILITY", 3);
 					enchantmentList.put("PROTECTION_ENVIRONMENTAL", 2);
 					if(rand2<=0.33) {
@@ -614,7 +619,7 @@ public class GenericItem {
 						prefix = "King's ";
 					}
 				}
-				else if(rand<=0.25) {
+				else if(rand<=0.70) {
 					enchantmentList.put("PROTECTION_ENVIRONMENTAL", 3);
 					enchantmentList.put("PROTECTION_FIRE", 3);
 					enchantmentList.put("PROTECTION_EXPLOSIONS", 3);
@@ -643,7 +648,7 @@ public class GenericItem {
 				}
 			}
 			if(Arrays.asList("PICKAXE","SPADE").contains(type)) {
-				if(rand<=0.05) {
+				if(rand<=0.30) {
 					enchantmentList.put("DIG_SPEED", 4);
 					enchantmentList.put("DURABILITY", 4);
 					if(rand2<=0.33) {
@@ -656,9 +661,9 @@ public class GenericItem {
 						prefix = "Distinct ";
 					}
 				}
-				else if(rand<=0.25) {
+				else if(rand<=0.70) {
 					enchantmentList.put("LOOT_BONUS_BLOCKS", 4);
-					enchantmentList.put("DURABLITY", 1);
+					enchantmentList.put("DURABILITY", 1);
 					enchantmentList.put("DIG_SPEED", 2);
 					if(rand2<=0.33) {
 						prefix = "Xrayer's ";						
@@ -688,7 +693,7 @@ public class GenericItem {
 		}
 		else if(rarity == 4) {
 			if(Arrays.asList("Sword","Axe").contains(type)) {
-				if(rand<=0.10) {
+				if(rand<=0.25) {
 					enchantmentList.put("DAMAGE_ALL", 4);
 					enchantmentList.put("LOOT_BONUS_MOBS", 1);
 					enchantmentList.put("DURABILITY", 1);
@@ -704,7 +709,7 @@ public class GenericItem {
 						prefix = "Reaper's ";
 					}
 				}
-				else if(rand<=0.20) {
+				else if(rand<=0.50) {
 					enchantmentList.put("DAMAGE_UNDEAD", 5);
 					enchantmentList.put("DAMAGE_ARTHROPODS", 5);
 					enchantmentList.put("DURABILITY", 3);
@@ -719,7 +724,7 @@ public class GenericItem {
 						prefix = "Adventure's Enfused ";
 					}
 				}
-				else if(rand<=0.45) {
+				else if(rand<=0.75) {
 					enchantmentList.put("KNOCKBACK", 4);
 					enchantmentList.put("FIRE_ASPECT", 3);
 					if(rand2<=0.33) {
@@ -747,7 +752,7 @@ public class GenericItem {
 				}
 			}
 			if(Arrays.asList("Helmet","Chestplate","Leggings","Boots").contains(type)) {
-				if(rand<=0.15) {
+				if(rand<=0.50) {
 					enchantmentList.put("DURABILITY", 3);
 					enchantmentList.put("PROTECTION_ENVIRONMENTAL", 5);
 					if(rand2<=0.33) {
@@ -767,7 +772,7 @@ public class GenericItem {
 						prefix = "Bullet Proof ";						
 					}
 					else if(rand2<=0.66) {
-						prefix = "Marksman's Bane ";
+						prefix = "Marksman's Baneful ";
 					}
 					else {
 						prefix = "Impassable Barrier ";
@@ -775,7 +780,7 @@ public class GenericItem {
 				}
 			}
 			if(Arrays.asList("PICKAXE","SPADE").contains(type)) {
-				if(rand<=0.05) {
+				if(rand<=0.50) {
 					enchantmentList.put("DIG_SPEED", 4);
 					enchantmentList.put("DURABILITY", 4);
 					enchantmentList.put("LOOT_BONUS_BLOCKS", 4);
@@ -820,7 +825,7 @@ public class GenericItem {
 				suffix = " Of The "+WordUtils.capitalizeFully(explosionString.replace("_", " "));
 			}
 			SpecialItem item = new SpecialItem(prefix+WordUtils.capitalizeFully(material+" "+type)+suffix+".", material.toUpperCase()+"_"+type.toUpperCase(), enchantmentList, rarity, explosionString, null, null);			
-			return item.getItem("TahPie", boss);
+			return item.getItem(killer, boss);
 		}
 		return new ItemStack(Material.DIAMOND);
 	}

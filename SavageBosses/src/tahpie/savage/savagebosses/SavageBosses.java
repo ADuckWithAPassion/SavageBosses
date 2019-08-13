@@ -1,9 +1,6 @@
 package tahpie.savage.savagebosses;
 
-import org.bukkit.Bukkit;
-import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.InvalidConfigurationException;
-import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.craftbukkit.libs.jline.internal.Log;
 import org.bukkit.event.Listener;
@@ -14,17 +11,12 @@ import tahpie.savage.savagebosses.bosses.Boss;
 import tahpie.savage.savagebosses.bosses.GenericBoss;
 import tahpie.savage.savagebosses.bosses.NMSUtils;
 import tahpie.savage.savagebosses.bosses.Twiggy;
-import tahpie.savage.savagebosses.questitems.GenericItem;
 import tahpie.savage.savagebosses.questitems.SpecialItem;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Objects;
-import java.util.UUID;
 
 public class SavageBosses extends JavaPlugin implements Listener{
 	
@@ -35,7 +27,7 @@ public class SavageBosses extends JavaPlugin implements Listener{
 	private YamlConfiguration bossConfig;
 	
 	HashMap<String, SpecialItem> itemMap = new HashMap<String, SpecialItem>();
-	HashMap<String, GenericBoss> bossMap = new HashMap<String, GenericBoss>();
+	HashMap<String, GenericBoss> customBossMap = new HashMap<String, GenericBoss>();
 	
 	@Override
 	public void onEnable() {
@@ -109,19 +101,21 @@ public class SavageBosses extends JavaPlugin implements Listener{
     		String killer = itemConfig.getString(itemKey+".killer");
     		int chance = itemConfig.getInt(itemKey+".chance");
     		String effect = itemConfig.getString(itemKey+".effect");
-    		
-    		itemMap.put(name, new SpecialItem(name, mat, enchantmentList, rarityInt, explosionString, tag, effect));
+    		SpecialItem item = new SpecialItem(name, mat, enchantmentList, rarityInt, explosionString, tag, effect);
+    		item.setChance(chance);
+    		item.setBoss(boss);
+    		itemMap.put(name, item);
     	}
     }
     public void loadCustomBosses() {
     	for(String name: bossConfig.getKeys(false)) {
-    		bossMap.put(name, new GenericBoss(bossConfig.getConfigurationSection(name), this));
+    		customBossMap.put(name, new GenericBoss(bossConfig.getConfigurationSection(name), this));
     	}
     }
     public HashMap<String, SpecialItem> getItems(){
     	return itemMap;
     }
-    public HashMap<String, GenericBoss> getBosses(){
-    	return bossMap;
+    public HashMap<String, GenericBoss> getCustomBosses(){
+    	return customBossMap;
     }
 }

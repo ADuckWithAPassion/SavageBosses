@@ -9,7 +9,7 @@
   tag: Touched By Twiggy
   boss: Twiggy
   killer: TahPie
-  chance: 0
+  chance: 1
   effect: null
 2:
   name: Bard's Buff
@@ -21,7 +21,7 @@
   tag: null
   boss: Twiggy
   killer: TahPie
-  chance: 0
+  chance: 2
   effect: Consume to&a buff&5&o your party.
 3:
   name: Assassin's Bane
@@ -33,7 +33,7 @@
   tag: null
   boss: Twiggy
   killer: TahPie
-  chance: 0
+  chance: 2
   effect: Consume to&a reveal&5&o nearby invisible assassins.
 4:
   name: Paladins's Aura
@@ -44,8 +44,8 @@
   explosionString: null
   tag: null
   boss: Twiggy
-  killer: TahPie
-  chance: 0
+  killer: TahPie    
+  chance: 2
   effect: Consume to gain&a invincibility&5&o for 5 seconds.
 5:
   name: Pyro's Flame
@@ -69,5 +69,5 @@
   tag: null
   boss: Twiggy
   killer: TahPie
-  chance: 0
+  chance: 2
   effect: Consume to&a leap&5&o across the skies.

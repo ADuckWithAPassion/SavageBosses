@@ -7,13 +7,16 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map.Entry;
+
+import javax.security.auth.Destroyable;
+
 import org.bukkit.Bukkit;
+import org.bukkit.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.SkullType;
 import org.bukkit.Sound;
 import org.bukkit.craftbukkit.libs.jline.internal.Log;
-import org.bukkit.craftbukkit.v1_8_R3.CraftWorld;
 import org.bukkit.craftbukkit.v1_8_R3.entity.CraftLivingEntity;
 import org.bukkit.craftbukkit.v1_8_R3.entity.CraftPlayer;
 import org.bukkit.craftbukkit.v1_8_R3.entity.CraftSkeleton;
@@ -30,7 +33,8 @@ import org.bukkit.metadata.FixedMetadataValue;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 
-import net.md_5.bungee.api.ChatColor;
+import apallo.savage.savageclasses.Cooldown;
+import net.citizensnpcs.api.CitizensAPI;
 import net.minecraft.server.v1_8_R3.DamageSource;
 import net.minecraft.server.v1_8_R3.EnchantmentManager;
 import net.minecraft.server.v1_8_R3.Entity;
@@ -41,38 +45,39 @@ import net.minecraft.server.v1_8_R3.EnumParticle;
 import net.minecraft.server.v1_8_R3.GenericAttributes;
 import net.minecraft.server.v1_8_R3.IRangedEntity;
 import net.minecraft.server.v1_8_R3.MathHelper;
-import net.minecraft.server.v1_8_R3.Navigation;
 import net.minecraft.server.v1_8_R3.PacketPlayOutWorldParticles;
-import net.minecraft.server.v1_8_R3.PathfinderGoalFloat;
 import net.minecraft.server.v1_8_R3.PathfinderGoalHurtByTarget;
 import net.minecraft.server.v1_8_R3.PathfinderGoalLookAtPlayer;
 import net.minecraft.server.v1_8_R3.PathfinderGoalMeleeAttack;
-import net.minecraft.server.v1_8_R3.PathfinderGoalMoveThroughVillage;
 import net.minecraft.server.v1_8_R3.PathfinderGoalMoveTowardsRestriction;
-import net.minecraft.server.v1_8_R3.PathfinderGoalNearestAttackableTarget;
 import net.minecraft.server.v1_8_R3.PathfinderGoalRandomLookaround;
 import net.minecraft.server.v1_8_R3.PathfinderGoalRandomStroll;
 import net.minecraft.server.v1_8_R3.PathfinderGoalSelector;
 import net.minecraft.server.v1_8_R3.World;
 import tahpie.savage.savagebosses.SavageBosses;
 import tahpie.savage.savagebosses.SavageUtility;
+import tahpie.savage.savagebosses.questitems.GenericItem;
 import tahpie.savage.savagebosses.questitems.SpecialItem;
 
-public class Twiggy extends EntitySkeleton implements IRangedEntity {
+public class Twiggy extends EntitySkeleton implements IRangedEntity,BossInterface {
 	Skeleton parent;
-	int delay = 20*10;
+	int delay = 20*6;
 	int counter = 0;
+	int difficulty = 1;
 	String name = "Twiggy";
 	int curseAOE = 4;
 	List<Method> abilities = new ArrayList<Method>();
 	int abilityCounter = 0;
 	SavageBosses SB;
 	HashMap<SpecialItem, Integer> drops;
-
-	public Twiggy(Player player, World world,SavageBosses SB){
+	Cooldown teleportCooldown;
+	Location spawnLoc;
+	
+	public Twiggy(Location loc, World world,SavageBosses SB){
 		super(world);
 		this.SB = SB;
-		setLocation(player.getLocation().getX(), player.getLocation().getY(),player.getLocation().getZ(), player.getLocation().getYaw(), player.getLocation().getPitch());
+		setLocation(loc.getX(), loc.getY(),loc.getZ(), loc.getYaw(), loc.getPitch());
+		spawnLoc = loc;
 		((CraftLivingEntity) this.getBukkitEntity()).setRemoveWhenFarAway(false);
 		world.addEntity(this, SpawnReason.CUSTOM);
 		parent = (CraftSkeleton) this.getBukkitEntity();
@@ -88,6 +93,9 @@ public class Twiggy extends EntitySkeleton implements IRangedEntity {
 		parent.getEquipment().setHelmet(new org.bukkit.inventory.ItemStack(head));
 		parent.setCustomName(ChatColor.DARK_RED+name);
 		parent.setCustomNameVisible(true);
+		SavageUtility.addBoss(this);
+		SavageUtility.broadcastMessage(ChatColor.RED+name+": "+ChatColor.GREEN+"I sense a challenger...", parent.getLocation(), 30);
+		teleportCooldown = new Cooldown(3000);
 		try {
 			Field bField = PathfinderGoalSelector.class.getDeclaredField("b");
 			bField.setAccessible(true);
@@ -112,6 +120,7 @@ public class Twiggy extends EntitySkeleton implements IRangedEntity {
 
 		this.loadDrops();
 		this.loadAbiltiies();
+		new abilityCycle(this);
 	}
 	public void loadAbiltiies() {
 		try {
@@ -128,13 +137,13 @@ public class Twiggy extends EntitySkeleton implements IRangedEntity {
 	public void loadDrops() {
 		drops = new HashMap<SpecialItem, Integer>();
 		int runningProbability = 0;
-//		for(Entry<String, SpecialItem> item:SB.getItems().entrySet()) {
-//			if(item.getValue().getBoss().equalsIgnoreCase(name)) {
-//				runningProbability += item.getValue().getChance();
-//				drops.put(item.getValue(), runningProbability);
-//				Log.info(runningProbability);
-//			}
-//		}
+		for(Entry<String, SpecialItem> item:SB.getItems().entrySet()) {
+			if(item.getValue().getBoss().equalsIgnoreCase(name)) {
+				runningProbability += item.getValue().getChance();
+				drops.put(item.getValue(), runningProbability);
+				Log.info(runningProbability);
+			}
+		}
 	}
 
 	@Override
@@ -145,12 +154,6 @@ public class Twiggy extends EntitySkeleton implements IRangedEntity {
 		getAttributeInstance(GenericAttributes.MOVEMENT_SPEED).setValue(0.35);
 		getAttributeInstance(GenericAttributes.ATTACK_DAMAGE).setValue(4);
 		getAttributeInstance(GenericAttributes.c).setValue(10.0);
-
-		//this.goalSelector.a(6, new PathfinderGoalLookAtPlayer(this, EntityHuman.class, 8.0f));
-		//this.goalSelector.a(6, new PathfinderGoalRandomLookaround(this));
-		//this.targetSelector.a(1, new PathfinderGoalHurtByTarget(this, false, new Class[0]));
-		//this.targetSelector.a(2, new PathfinderGoalNearestAttackableTarget<EntityHuman>(this, EntityHuman.class, true));
-
 	}
 	@Override
 	public boolean r(Entity entity){
@@ -163,14 +166,15 @@ public class Twiggy extends EntitySkeleton implements IRangedEntity {
 		}
 		i=3;
 		LivingEntity target = ((LivingEntity)entity.getBukkitEntity());
-		if(random.nextInt(100)+1<=20) {
-			target.addPotionEffect(new PotionEffect(PotionEffectType.SLOW, 20*3, 2));
+		if(random.nextInt(100)+1<=40) {
+			target.addPotionEffect(new PotionEffect(PotionEffectType.SLOW, 20*3, 4));
+			target.addPotionEffect(new PotionEffect(PotionEffectType.BLINDNESS, 20, 1));
 			SavageUtility.displayMessage(ChatColor.DARK_RED+name+ChatColor.GREEN+" Slashes at your hamstring, applying a strong slow.", target); // 20% chance to slow
 		}
 		boolean flag = entity.damageEntity(DamageSource.mobAttack(this), f);
 		if (flag){
 			if (i > 0){
-				entity.g(-MathHelper.sin(this.yaw * 3.1415927F / 180.0F) * i * 0.5F, 0.5D, MathHelper.cos(this.yaw * 3.1415927F / 180.0F) * i * 0.5F);
+				entity.g(-MathHelper.sin(this.yaw * 3.1415927F / 180.0F) * i * 0.5F, 0.2D, MathHelper.cos(this.yaw * 3.1415927F / 180.0F) * i * 0.5F);
 				this.motX *= 0.6D;
 				this.motZ *= 0.6D;
 			}
@@ -189,30 +193,17 @@ public class Twiggy extends EntitySkeleton implements IRangedEntity {
 	@Override
 	public boolean damageEntity(DamageSource damagesource, float f2) { // triggers when boss takes damage
 		boolean toReturn = super.damageEntity(damagesource, f2);
-		if(f2>=3) { // prevent things like snowball damage from triggering this ability
+		if(f2>=3 && !this.isInvulnerable(damagesource) && damagesource.getEntity()!=null && damagesource.getEntity().getBukkitEntity() instanceof Player) { // prevent things like snowball damage from triggering this ability
 			if(random.nextInt(100)+1<=20) { //prevent boss from getting combo'd to hard in corner
-				teleportToEnemy();		
+				if(!teleportCooldown.isOnCooldown((Player)damagesource.getEntity().getBukkitEntity())) {
+					teleportToEnemy();		
+					teleportCooldown.addCooldown((Player)damagesource.getEntity().getBukkitEntity());
+					Log.info(teleportCooldown.isOnCooldown((Player)damagesource.getEntity().getBukkitEntity()));
+					Log.info(((Player)damagesource.getEntity().getBukkitEntity()).getName());
+				}
 			}
 		}
 		return toReturn;
-	}
-
-	@Override
-	public void K() { // goes once a tick
-		super.K();
-		counter++;
-
-		if(counter>=delay) { // use a scheduled ability 
-			counter = 0;
-			try {
-				abilities.get(abilityCounter % abilities.size()).invoke(this); //reflection is slow but easy to code. (executes ability)
-			} catch (IllegalAccessException | IllegalArgumentException | InvocationTargetException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-				Log.info("INVALID METHOD???");
-			}
-			abilityCounter++;
-		}
 	}
 
 	public void teleportToEnemy() {
@@ -221,32 +212,20 @@ public class Twiggy extends EntitySkeleton implements IRangedEntity {
 			return;
 		}
 		org.bukkit.entity.Player target = (Player)nearbyEntities.get(random.nextInt(nearbyEntities.size())); // select random player
-		target.addPotionEffect(new PotionEffect(PotionEffectType.CONFUSION, 20*5, 0));
-		target.addPotionEffect(new PotionEffect(PotionEffectType.SLOW_DIGGING, 20*2, 3));
-		target.damage(4);
-		target.getWorld().createExplosion(target.getLocation(), 1);
+		target.addPotionEffect(new PotionEffect(PotionEffectType.BLINDNESS, 3*20, 0));
+		target.addPotionEffect(new PotionEffect(PotionEffectType.WEAKNESS, 3*20, 0));
+		target.addPotionEffect(new PotionEffect(PotionEffectType.SLOW, 3*20, 3));
+		target.addPotionEffect(new PotionEffect(PotionEffectType.SLOW_DIGGING, 3*20, 3));
+		target.addPotionEffect(new PotionEffect(PotionEffectType.HUNGER, 3*20, 0));
+		target.damage(3);
+		target.getWorld().createExplosion(target.getEyeLocation(), 0);
 		parent.teleport(target);
 		SavageUtility.broadcastMessage(ChatColor.DARK_RED+name+ChatColor.GREEN+" Teleports to a random nearby enemy.", parent.getLocation(), 20);
 		SavageUtility.displayMessage(ChatColor.DARK_RED+name+ChatColor.GREEN+" Teleports to you, inflicting minor damage.", target);
 	}
 	public void curseEnemy() {
 		List<LivingEntity> nearbyEntities = SavageUtility.getNearbyEntities(parent, 15, Player.class, false);
-		Location l = parent.getLocation();
-		int x = l.getBlockX() - curseAOE;
-		int y = l.getBlockY() - curseAOE;
-		int z = l.getBlockZ() - curseAOE;
 
-		for (int i = x; i < x + 2*curseAOE; i++){
-			for (int j = y; j < y + 2*curseAOE; j++){
-				for (int k = z; k < z + 2*curseAOE; k++){
-					Location newL = new Location(l.getWorld(), i, j, k); 
-					PacketPlayOutWorldParticles packet = new PacketPlayOutWorldParticles(EnumParticle.CRIT_MAGIC,true, (float) (l.getX()), (float) (l.getY()+2), (float) (l.getZ()), 0, 0, 0, 0, 1);
-					for(Player online : Bukkit.getOnlinePlayers()) {						
-						((CraftPlayer)online).getHandle().playerConnection.sendPacket(packet);	
-					}    			
-				}
-			}
-		}
 		for(org.bukkit.entity.Entity nearby: nearbyEntities) {
 			Player target = (Player)nearby;
 			target.addPotionEffect(new PotionEffect(PotionEffectType.BLINDNESS, 3*20, 0));
@@ -272,8 +251,7 @@ public class Twiggy extends EntitySkeleton implements IRangedEntity {
 	}
 	public void buffSelf() {
 		parent.addPotionEffect(new PotionEffect(PotionEffectType.SPEED, 20*10, 2));
-		parent.addPotionEffect(new PotionEffect(PotionEffectType.INCREASE_DAMAGE, 20*10, 2));
-		parent.addPotionEffect(new PotionEffect(PotionEffectType.DAMAGE_RESISTANCE, 20*10, 2));
+		parent.addPotionEffect(new PotionEffect(PotionEffectType.DAMAGE_RESISTANCE, 20*10, 1));
 		parent.addPotionEffect(new PotionEffect(PotionEffectType.FIRE_RESISTANCE, 20*10, 2));
 		parent.addPotionEffect(new PotionEffect(PotionEffectType.POISON, 20*10, 1));
 		parent.addPotionEffect(new PotionEffect(PotionEffectType.FAST_DIGGING, 20*10, 2));
@@ -285,8 +263,8 @@ public class Twiggy extends EntitySkeleton implements IRangedEntity {
 		for(org.bukkit.entity.Entity nearby: nearbyEntities) {
 			Player target = (Player)nearby;
 			target.teleport(parent);
-			target.addPotionEffect(new PotionEffect(PotionEffectType.CONFUSION, 20*5, 0));
-			target.addPotionEffect(new PotionEffect(PotionEffectType.SLOW_DIGGING, 20*2, 3));
+			target.addPotionEffect(new PotionEffect(PotionEffectType.CONFUSION, 20*8, 0));
+			target.addPotionEffect(new PotionEffect(PotionEffectType.SLOW_DIGGING, 20*3, 3));
 			target.damage(4);
 			if(SavageUtility.removePositiveBuffs(target)) {
 				SavageUtility.displayMessage(ChatColor.DARK_RED+name+ChatColor.GREEN+" Removes any positive buffs.", target);
@@ -297,21 +275,97 @@ public class Twiggy extends EntitySkeleton implements IRangedEntity {
 	@Override
 	protected void dropDeathLoot(boolean flag, int i) {
 		super.dropDeathLoot(flag, i); 
-		org.bukkit.inventory.ItemStack drop = getBossDrop();
+		SavageUtility.broadcastMessage(org.bukkit.ChatColor.RED+name+": "+org.bukkit.ChatColor.GREEN+"CLUCK! CLUCK! CLUCK!", parent.getLocation(), 30);
+		String killer = "";
+		if(parent.getLastDamageCause() instanceof Player) {
+			killer = parent.getLastDamageCause().getEntity().getName();
+		}
+		org.bukkit.inventory.ItemStack drop = getBossDrop(killer);
 		if(drop.hasItemMeta() && drop.getItemMeta().hasLore()) {
 			SavageUtility.broadcastMessage(ChatColor.GOLD+"Take this, great warrior.", parent.getLocation(), 15);			
 		}
 		parent.getWorld().dropItemNaturally(parent.getLocation(), drop);		
+		
+		parent.getWorld().dropItemNaturally(parent.getLocation(), GenericItem.getItem(name,difficulty, killer));		
+		remove();
 	}
-	public org.bukkit.inventory.ItemStack getBossDrop() {
+	public org.bukkit.inventory.ItemStack getBossDrop(String killer) {
 		//    	SpecialItem item = new SpecialItem("Twiggy's Axe", "DIAMOND_AXE", enchantmentList, 5, "BLUE", "It feels hot to touch.", "Twiggy", "TahPie", 50, null);
 		int number = random.nextInt(100);
 		for(Entry<SpecialItem, Integer> item: drops.entrySet()) {
-			Log.info(item.getValue());
 			if(item.getValue() > number) {
-				return item.getKey().getItem("TahPie","Twiggy");
+				return item.getKey().getItem(killer,name);
 			}
 		}
 		return(new org.bukkit.inventory.ItemStack(Material.BONE));
+	}
+	protected void finalize() {
+		Log.info("Garbage Collected: "+getName());
+	}
+
+	@Override
+	public Location getSpawn() {
+		return spawnLoc;
+	}
+	@Override
+	public void remove() {
+		SavageUtility.removeBoss(this);
+		parent.remove();
+		new Respawn();
+	}
+	@Override
+	public Location getLocation() {
+		return parent.getLocation();
+	}
+	public class abilityCycle implements Runnable {
+		private int task;
+		private Twiggy boss;
+		public abilityCycle(Twiggy boss) {
+			task = Bukkit.getScheduler().scheduleSyncDelayedTask(SB, this, 20*5);
+			this.boss = boss;
+		}
+		public void cancel() {
+			Bukkit.getScheduler().cancelTask(task);
+		}
+		@Override
+		public void run() {
+			if(isAlive()) {
+				try {
+					abilities.get(abilityCounter % abilities.size()).invoke(boss); //reflection is slow but easy to code. (executes ability)
+				} catch (IllegalAccessException | IllegalArgumentException | InvocationTargetException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+					Log.info("INVALID METHOD???");
+				}
+				abilityCounter++;				
+				task = Bukkit.getScheduler().scheduleSyncDelayedTask(SB, this, 20*6);
+			}
+			else {
+				cancel();
+			}
+		}
+		
+	}
+	public class Respawn implements Runnable{
+		public Respawn() {
+			Bukkit.getScheduler().scheduleSyncDelayedTask(SB,this, 20*10);
+		}
+
+		@Override
+		public void run() {
+			boolean found = false;
+			for(LivingEntity nearby: SavageUtility.getNearbyEntities(spawnLoc, 30, Player.class)) {
+				if(!CitizensAPI.getNPCRegistry().isNPC(nearby)) {
+					found = true;
+				}
+			}
+			if(found) {
+				new Twiggy(spawnLoc, world, SB);				
+			}
+			else {
+				Bukkit.getScheduler().scheduleSyncDelayedTask(SB,this, 20*10);
+			}
+		}
+		
 	}
 }

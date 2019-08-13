@@ -3,7 +3,6 @@ package tahpie.savage.savagebosses.bosses;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Random;
 
@@ -41,6 +40,7 @@ import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 import org.bukkit.util.Vector;
 
+import net.citizensnpcs.api.CitizensAPI;
 import tahpie.savage.savagebosses.SavageBosses;
 import tahpie.savage.savagebosses.SavageUtility;
 
@@ -81,9 +81,7 @@ public class Boss implements Listener{
 		bosses.put(boss.getParent(), boss);
 	}
 	public static void unRegisterBoss(IndividualBoss boss) {
-		Log.info(bosses);
 		bosses.remove(boss.getParent());
-		Log.info(bosses);
 	}
 	@EventHandler
 	public void onAttack(EntityDamageByEntityEvent event){
@@ -115,8 +113,7 @@ public class Boss implements Listener{
 		if(block.getType().equals(Material.SIGN_POST)) {
 			Sign sign = (Sign)block.getState(); 
 			String text = sign.getLine(0);
-			Log.info(SB.getBosses());
-			if(SB.getBosses().containsKey(text)) {
+			if(SB.getCustomBosses().containsKey(text)) {
 				int count = 0;
 				for(Entity nearby : entity.getNearbyEntities(10, 10, 10)) {
 					if(nearby instanceof LivingEntity) {
@@ -124,7 +121,7 @@ public class Boss implements Listener{
 					}
 				}
 				if(count <= 5) {
-					new IndividualBoss(SB.getBosses().get(text), entity.getLocation(), SB);					
+					new IndividualBoss(SB.getCustomBosses().get(text), entity.getLocation(), SB);					
 				}
 				entity.remove();
 			}
@@ -164,7 +161,7 @@ public class Boss implements Listener{
 		}
 	}
 	@EventHandler
-	public void fireworkExplosion(PlayerInteractEvent event) {
+	public void customEffects(PlayerInteractEvent event) {
 		Player player = event.getPlayer();
 		ItemStack item = player.getInventory().getItemInHand();
 		if(item.hasItemMeta()) {
@@ -208,6 +205,7 @@ public class Boss implements Listener{
 			}
 		}
 	}
+
 	public class ensureNearbySpawn implements Runnable{
 		public ensureNearbySpawn() {
 		}
@@ -216,17 +214,57 @@ public class Boss implements Listener{
 			for(Entry<LivingEntity, IndividualBoss> entry: new HashMap<LivingEntity, IndividualBoss>(bosses).entrySet()) {
 				Log.info(new HashMap<LivingEntity, IndividualBoss>(bosses).entrySet());
 				Log.info(entry);
-				if(entry.getValue().getSpawn().distance(entry.getKey().getLocation())>=20) {
+				if(entry.getValue().getSpawn().distance(entry.getKey().getLocation())>=30) {
 					SavageUtility.broadcastMessage(ChatColor.DARK_GRAY+entry.getValue().getName()+": I have wandered too far...", entry.getKey().getLocation(), 15);
 					entry.getValue().destroy();
 				}
-				else if(entry.getKey().getTicksLived() >= 20*10) {
+				else if(entry.getKey().getTicksLived() >= 20*60) {
 					SavageUtility.broadcastMessage(ChatColor.DARK_GRAY+entry.getValue().getName()+": I am too old...", entry.getKey().getLocation(), 15);
 					entry.getValue().destroy();	
 				}
-			}	
+				if(entry.getValue().getSpawn().distance(entry.getKey().getLocation())>=30) {
+					Log.info("TOO FAR");
+					SavageUtility.broadcastMessage(ChatColor.DARK_GRAY+entry.getValue().getName()+": I have wandered too far...", entry.getKey().getLocation(), 15);
+					entry.getValue().destroy();
+				}
+				else {
+					boolean found = false;
+					for(Player nearby: entry.getKey().getLocation().getWorld().getEntitiesByClass(Player.class)) {
+						if(!CitizensAPI.getNPCRegistry().isNPC(nearby) && nearby.getLocation().distance(entry.getKey().getLocation())<=30) {
+							found = true;
+						}
+					}
+					if(!found) {
+						Log.info("NO NEARBY");
+						SavageUtility.broadcastMessage(ChatColor.DARK_GRAY+entry.getValue().getName()+": I see no enemies...", entry.getKey().getLocation(), 15);
+						entry.getValue().destroy();		
+					}
+				}
+			}
+			for(BossInterface entry: SavageUtility.getBosses()) {
+				Log.info(entry);
+				if(entry.getSpawn().distance(entry.getLocation())>=30) {
+					Log.info("TOO FAR");
+					SavageUtility.broadcastMessage(ChatColor.DARK_GRAY+entry.getName()+": I have wandered too far...", entry.getLocation(), 15);
+					entry.remove();
+				}
+				else {
+					boolean found = false;
+					for(Player nearby: entry.getLocation().getWorld().getEntitiesByClass(Player.class)) {
+						if(!CitizensAPI.getNPCRegistry().isNPC(nearby) && nearby.getLocation().distance(entry.getLocation())<=30) {
+							found = true;
+						}
+					}
+					if(!found) {
+						Log.info("NO NEARBY");
+						SavageUtility.broadcastMessage(ChatColor.DARK_GRAY+entry.getName()+": I see no enemies...", entry.getLocation(), 15);
+						entry.remove();		
+					}
+				}
+			}
 		}
 	}
+
 	private void marksmansLeap(ItemStack item, Player player) {
 		if(globalItemCooldown.isOnCooldown(player)) {
 			SavageUtility.displayMessage(ChatColor.RED + "You cannot use " + ChatColor.GOLD + "Custom Items " + ChatColor.RED + "again for " + ChatColor.AQUA + globalItemCooldown.getRemainingTime(player) + ChatColor.RED + " seconds.", player);
@@ -265,7 +303,7 @@ public class Boss implements Listener{
 			SavageUtility.displayMessage(ChatColor.RED + "You cannot use " + ChatColor.GOLD + "Custom Items " + ChatColor.RED + "again for " + ChatColor.AQUA + globalItemCooldown.getRemainingTime(player) + ChatColor.RED + " seconds.", player);
 			return;
 		}
-		Player target = (Player) SavageUtility.getInfront(player, 15, Player.class, "notInParty");
+		Player target = (Player) apallo.savage.savageclasses.SavageUtility.getTarget(player, 15, false);
 		if(target == null) {
 			SavageUtility.displayMessage(ChatColor.RED + "You must have a player target not in your party.",player);
 			return;
@@ -305,7 +343,7 @@ public class Boss implements Listener{
 			SavageUtility.displayMessage(ChatColor.RED + "You cannot use " + ChatColor.GOLD + "Custom Items " + ChatColor.RED + "again for " + ChatColor.AQUA + globalItemCooldown.getRemainingTime(player) + ChatColor.RED + " seconds.", player);
 			return;
 		}
-		item.setAmount(item.getAmount()-1);
+		removeItems(player, item);
 		SavageUtility.broadcastMessage(ChatColor.GOLD+player.getName()+ChatColor.AQUA+" Uses "+ChatColor.DARK_PURPLE+"Bard's Buff"+ChatColor.AQUA+" to buff his party.", player.getLocation(), 15);
 		for(Entity nearby: SavageUtility.getPartyMembers(player)) {
 			if(nearby.getWorld().equals(player.getWorld()) && nearby.getLocation().distance(player.getLocation())<= 30) {
@@ -322,5 +360,17 @@ public class Boss implements Listener{
 			}
 		}
 		globalItemCooldown.addCooldown(player);
+	}
+	public void removeItems(Player player, ItemStack item) {
+		Log.info(item.getAmount());
+		Log.info(item);
+		if(item.getAmount()>1) {
+			item.setAmount(item.getAmount()-1);
+		}
+		else {
+			player.getInventory().setItem(player.getInventory().getHeldItemSlot(), new ItemStack(Material.AIR));			
+		}
+		Log.info(item.getAmount());
+		Log.info(item);
 	}
 }

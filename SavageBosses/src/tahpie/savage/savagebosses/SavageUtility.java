@@ -2,11 +2,7 @@ package tahpie.savage.savagebosses;
 
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collection;
 import java.util.List;
-import java.util.UUID;
-
-import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.craftbukkit.libs.jline.internal.Log;
@@ -22,9 +18,10 @@ import com.gmail.nossr50.api.PartyAPI;
 
 import net.md_5.bungee.api.ChatColor;
 import tahpie.savage.savagebosses.bosses.Boss;
+import tahpie.savage.savagebosses.bosses.BossInterface;
 
 public class SavageUtility {
-	private static List<Entity> bosses = new ArrayList<Entity>();
+	private static List<BossInterface> bosses = new ArrayList<BossInterface>();
 	private static List<Entity> customMobs = new ArrayList<Entity>();
 
 	public SavageUtility() {}
@@ -130,7 +127,7 @@ public class SavageUtility {
     }
 
 	public static void despawnBosses() {
-		for(Entity boss: getBosses()) {
+		for(BossInterface boss: getBosses()) {
 			Log.info("Removing: "+boss.getName());
 			boss.remove();
 			Log.info("REMOVED");
@@ -145,15 +142,15 @@ public class SavageUtility {
 		return new ArrayList<Entity>(customMobs );
 	}
 
-	public static List<Entity> getBosses() {
-		return new ArrayList<Entity>(bosses);
+	public static List<BossInterface> getBosses() {
+		return new ArrayList<BossInterface>(bosses);
 	}
 
-	public static void addBoss(Entity boss) {
+	public static void addBoss(BossInterface boss) {
 		bosses.add(boss);
 	}
 
-	public static void removeBoss(Entity boss) {
+	public static void removeBoss(BossInterface boss) {
 		bosses.remove(boss);
 	}
 
