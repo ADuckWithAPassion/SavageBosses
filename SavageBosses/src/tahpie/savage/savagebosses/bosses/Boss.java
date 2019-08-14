@@ -110,7 +110,7 @@ public class Boss implements Listener{
 		//CraftCreatureSpawner craftSpawner = ((CraftCreatureSpawner)spawner);
 		Entity entity = event.getEntity();
 		Block block = spawner.getWorld().getBlockAt(spawner.getLocation().subtract(0, 1, 0));
-		if(block.getType().equals(Material.SIGN_POST)) {
+		if(block.getType().equals(Material.SIGN_POST) && (block.getWorld().getName().equals("RPG"))) {
 			Sign sign = (Sign)block.getState(); 
 			String text = sign.getLine(0);
 			if(SB.getCustomBosses().containsKey(text)) {

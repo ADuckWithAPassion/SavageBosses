@@ -293,6 +293,7 @@ public class Twiggy extends EntitySkeleton implements IRangedEntity,BossInterfac
 		//    	SpecialItem item = new SpecialItem("Twiggy's Axe", "DIAMOND_AXE", enchantmentList, 5, "BLUE", "It feels hot to touch.", "Twiggy", "TahPie", 50, null);
 		int number = random.nextInt(100);
 		for(Entry<SpecialItem, Integer> item: drops.entrySet()) {
+			Log.info(item.getKey().getChance(), item.getValue(),"ITEM",number);
 			if(item.getValue() > number) {
 				return item.getKey().getItem(killer,name);
 			}
